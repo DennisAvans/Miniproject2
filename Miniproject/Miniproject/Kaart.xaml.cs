@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -34,6 +35,14 @@ namespace Miniproject
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            MapControl.Center =
+                new Geopoint(new BasicGeoposition()
+                {
+                    Latitude = 51.5854,
+                    Longitude = 4.7905
+                });
+            MapControl.ZoomLevel = 15;
+            MapControl.LandmarksVisible = true;
         }
     }
 }

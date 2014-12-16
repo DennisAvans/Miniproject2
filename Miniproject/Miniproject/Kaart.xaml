@@ -11,7 +11,7 @@
 
     <Grid>
 
-        <Maps:MapControl HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="620" Width="380"/>
+        <Maps:MapControl x:Name="MapControl" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="620" Width="380"/>
 
     </Grid>
 </Page>

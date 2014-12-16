@@ -13,11 +13,7 @@
 
         <Button x:Name="BestelPizzaButton" Content="Bestel Pizza" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BestelPizzaButton_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="400" Width="360" SelectionChanged="TextBlock_SelectionChanged" FontSize="24" Foreground="#FF972A2A">
-        	<Run Text="Welkom bij Hotter th"/>
-        	<Run Text="a"/>
-        	<Run Text="n my pizza "/>
-        	<Run Text="tracker"/>
-        	<Run Text="!"/>
+        	<Run Text="Welkom bij Hotter than my pizza tracker!"/>
         </TextBlock>
 
     </Grid>

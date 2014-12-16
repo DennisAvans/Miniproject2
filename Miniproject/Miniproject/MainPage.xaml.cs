@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Phone.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -27,8 +28,17 @@ namespace Miniproject
             this.InitializeComponent();
 
             this.NavigationCacheMode = NavigationCacheMode.Required;
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
         }
 
+        void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            if (Frame.CanGoBack)
+            {
+                e.Handled = true;
+                Frame.GoBack();
+            }
+        }
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
         /// </summary>
@@ -48,6 +58,11 @@ namespace Miniproject
         private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void BestelPizzaButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(BestelPagina));
         }
     }
 }

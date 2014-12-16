@@ -35,5 +35,10 @@ namespace Miniproject
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

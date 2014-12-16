@@ -9,7 +9,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid Margin="10,10,10,10">
-        <Button Content="Continue" HorizontalAlignment="Right" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
+        <Button x:Name="ContinueButton" Content="Continue" HorizontalAlignment="Right" Margin="10,10,10,10" VerticalAlignment="Bottom" Click="ContinueButton_Click"/>
         <TimePicker HorizontalAlignment="Left" Margin="261,0,0,0" VerticalAlignment="Top"/>
         <RadioButton Content="Akkoord algemene voorwaarden" HorizontalAlignment="Left" Margin="0,500,0,0" VerticalAlignment="Top"/>
         <ComboBox x:Name="comboBox_Kaas" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 50, 10 ,10">

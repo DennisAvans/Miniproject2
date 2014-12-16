@@ -1,14 +1,17 @@
 ﻿<Page
-    x:Class="Miniproject.Kaart"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Miniproject"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Maps="using:Windows.UI.Xaml.Controls.Maps"
+    x:Class="Miniproject.Kaart"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+
+        <Maps:MapControl HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="620" Width="380"/>
 
     </Grid>
 </Page>

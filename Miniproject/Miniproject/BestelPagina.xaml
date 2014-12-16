@@ -12,13 +12,35 @@
         <Button Content="Continue" HorizontalAlignment="Right" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
         <TimePicker HorizontalAlignment="Left" Margin="261,0,0,0" VerticalAlignment="Top"/>
         <RadioButton Content="Akkoord algemene voorwaarden" HorizontalAlignment="Left" Margin="0,500,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="comboBox1" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 50, 10 ,10">
+        <ComboBox x:Name="comboBox_Kaas" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 50, 10 ,10">
             <x:String>Geen Kaas</x:String>
             <x:String>Feta Kaas</x:String>
             <x:String>Cheddar Kaas</x:String>
             <x:String>Goudse Kaas</x:String>
             <x:String>Wosterhoutse Kaas</x:String>
-            <x:String>Kaas</x:String>
+            <x:String>Mozerella</x:String>
+        </ComboBox>
+
+        <ComboBox x:Name="comboBox_Fleesch" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 100, 10 ,10">
+            <x:String>Geen Vlees</x:String>
+            <x:String>Ham</x:String>
+            <x:String>Salami</x:String>
+            <x:String>Achterham</x:String>
+            <x:String>Been Ham</x:String>
+            <x:String>Schouder Ham</x:String>
+        </ComboBox>
+
+        <ComboBox x:Name="comboBox_Paddos" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 150, 10 ,10">
+            <x:String>Geen Champignons</x:String>
+            <x:String>Champignons</x:String>
+            <x:String>shii-take</x:String>
+        </ComboBox>
+
+        <ComboBox x:Name="comboBox_Korst" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 200, 10 ,10">
+            <x:String>Normale Korst</x:String>
+            <x:String>Gevuld met Kaas</x:String>
+            <x:String>Gevuld met Rookworst</x:String>
+            <x:String>gevuld met Spek</x:String>
         </ComboBox>
 
     </Grid>

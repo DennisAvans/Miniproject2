@@ -12,7 +12,14 @@
         <Button Content="Continue" HorizontalAlignment="Right" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
         <TimePicker HorizontalAlignment="Left" Margin="261,0,0,0" VerticalAlignment="Top"/>
         <RadioButton Content="Akkoord algemene voorwaarden" HorizontalAlignment="Left" Margin="0,500,0,0" VerticalAlignment="Top"/>
-        <ComboBox HorizontalAlignment="Left" Margin="250,44,0,0" VerticalAlignment="Top" Width="120"/>
+        <ComboBox x:Name="comboBox1" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 50, 10 ,10">
+            <x:String>Geen Kaas</x:String>
+            <x:String>Feta Kaas</x:String>
+            <x:String>Cheddar Kaas</x:String>
+            <x:String>Goudse Kaas</x:String>
+            <x:String>Wosterhoutse Kaas</x:String>
+            <x:String>Kaas</x:String>
+        </ComboBox>
 
     </Grid>
 </Page>

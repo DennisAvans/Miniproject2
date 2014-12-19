@@ -11,7 +11,11 @@
 
     <Grid>
 
+<<<<<<< HEAD
+        <Maps:MapControl x:Name="MapControl" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="620" Width="380"/>
+=======
         <Maps:MapControl x:Name="mapControl" HorizontalAlignment="Left" VerticalAlignment="Top" Height="550" Width="400"/>
+>>>>>>> 950779387f1edd8d361d773c8fcd8ae559c7641a
 
     </Grid>
 </Page>

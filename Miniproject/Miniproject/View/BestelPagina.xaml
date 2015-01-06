@@ -26,15 +26,29 @@
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
             <TextBlock Text="Hotter than my pizza tracker" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="Kies uw pizza" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock Text="Stel uw pizza samen" TextWrapping="Wrap" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}" FontSize="36"/>
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
-            <Button x:Name="ContinueButton" Content="Continue" HorizontalAlignment="Right" Margin="10,10,10,10" VerticalAlignment="Bottom" Click="ContinueButton_Click"/>
-            <TimePicker HorizontalAlignment="Left" Margin="261,0,0,0" VerticalAlignment="Top"/>
-            <RadioButton Content="Akkoord algemene voorwaarden" HorizontalAlignment="Left" Margin="0,500,0,0" VerticalAlignment="Top"/>
-            <ComboBox x:Name="comboBox_Kaas" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 50, 10 ,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock x:Name="TimeLabel" Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Text="Kies uw bezorgtijd" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTipService.ToolTip="hi" FontSize="20"/>
+            <TimePicker x:Name="PizzaTimePicker" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+            <TextBlock x:Name="KaasLabel" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Kies uw kaassoort" VerticalAlignment="Center" FontSize="20"/>
+            <ComboBox x:Name="comboBox_Kaas" SelectionChanged="comboBox_Kaas_SelectionChanged" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" PlaceholderText="Kies hier">
                 <x:String>Geen Kaas</x:String>
                 <x:String>Feta Kaas</x:String>
                 <x:String>Cheddar Kaas</x:String>
@@ -43,7 +57,8 @@
                 <x:String>Mozerella</x:String>
             </ComboBox>
 
-            <ComboBox x:Name="comboBox_Fleesch" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 100, 10 ,10">
+            <TextBlock x:Name="VleesLabel" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Kies uw vleessoort" VerticalAlignment="Center" FontSize="20" />
+            <ComboBox x:Name="comboBox_Fleesch" SelectionChanged="comboBox_Fleesch_SelectionChanged" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" PlaceholderText="Kies hier">
                 <x:String>Geen Vlees</x:String>
                 <x:String>Ham</x:String>
                 <x:String>Salami</x:String>
@@ -52,19 +67,33 @@
                 <x:String>Schouder Ham</x:String>
             </ComboBox>
 
-            <ComboBox x:Name="comboBox_Paddos" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 150, 10 ,10">
+            <TextBlock x:Name="PaddestoelLabel" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Kies uw paddestoelsoort" VerticalAlignment="Center" FontSize="20"/>
+            <ComboBox x:Name="comboBox_Paddos" SelectionChanged="comboBox_Paddos_SelectionChanged" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" PlaceholderText="Kies hier">
                 <x:String>Geen Champignons</x:String>
                 <x:String>Champignons</x:String>
-                <x:String>shii-take</x:String>
+                <x:String>Shii-take</x:String>
+                <x:String>KastanjeChampignons</x:String>
+                <x:String>Oesterzwam</x:String>
+                <x:String>Cantharel</x:String>
             </ComboBox>
 
-            <ComboBox x:Name="comboBox_Korst" Width="150" SelectionChanged="ComboBox_SelectionChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10, 200, 10 ,10">
+            <TextBlock x:Name="KorstLabel" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Kies uw korst" VerticalAlignment="Center" FontSize="20"/>
+            <ComboBox x:Name="comboBox_Korst" SelectionChanged="comboBox_Korst_SelectionChanged" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" PlaceholderText="Kies hier">
                 <x:String>Normale Korst</x:String>
+                <x:String>Zonder korst</x:String>
                 <x:String>Gevuld met Kaas</x:String>
                 <x:String>Gevuld met Rookworst</x:String>
-                <x:String>gevuld met Spek</x:String>
+                <x:String>Gevuld met Spek</x:String>
+                <x:String>Gevuld met kip</x:String>
             </ComboBox>
-            <TextBlock x:Name="TestBlock" HorizontalAlignment="Left" Margin="68,338,0,0" TextWrapping="Wrap" Text="{Binding Kaas}" VerticalAlignment="Top" Height="54" Width="200" FontSize="18"/>
+
+            <!-- <TextBlock x:Name="TestBlock" HorizontalAlignment="Left" Margin="68,338,0,0" TextWrapping="Wrap" Text="{Binding Kaas}" VerticalAlignment="Top" Height="54" Width="200" FontSize="18"/>-->
+            <CheckBox Name="ToS_checkbox" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="-10,0,0,0">
+                <CheckBox.Content>
+                    <TextBlock Text="Akkoord algemene voorwaarden" TextWrapping="Wrap" Height="85" Width="194"/>
+                </CheckBox.Content>
+            </CheckBox>
+            <Button x:Name="ContinueButton" Content="Doorgaan" Click="ContinueButton_Click" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </Page>

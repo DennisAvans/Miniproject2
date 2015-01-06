@@ -25,15 +25,23 @@
         <!-- Title Panel -->
         <StackPanel Grid.Row="0" Margin="19,0,0,0">
             <TextBlock Text="Hotter than my pizza tracker" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0"/>
-            <TextBlock Text="Volg uw pizza" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}"/>
+            <TextBlock Text="Volg uw pizza" Margin="0,-6.5,0,26.5" Style="{ThemeResource HeaderTextBlockStyle}" CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}" FontSize="36"/>
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="10,26.833,28,-17">
-
-            <Maps:MapControl x:Name="MapControl" HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.34,-0.615" Height="365"/>
+        <Grid Grid.Row="1" x:Name="ContentRoot">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="GetLocationButton" Grid.Row="2" Grid.Column="0" Content="Get location" HorizontalAlignment="Center" VerticalAlignment="Center" Click="GetLocationButton_Click" RenderTransformOrigin="1.433,0.583"/>
+            <Maps:MapControl x:Name="MapControl" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" MapServiceToken="Zxf8UmCg_ux0pq1PSZd8GA" />
             <TextBlock x:Name="InfoBox" HorizontalAlignment="Left" Margin="140,425,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="38" Width="212" Text="Long: Lat: Accuracy:"/>
-            <Button x:Name="GetLocationButton" Content="Get location" HorizontalAlignment="Left" Margin="0,415,0,0" VerticalAlignment="Top" Click="GetLocationButton_Click"/>
 
         </Grid>
     </Grid>

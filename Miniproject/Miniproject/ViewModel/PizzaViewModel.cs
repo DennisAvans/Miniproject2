@@ -20,7 +20,8 @@ namespace Miniproject.ViewModel
                 _kaas = "",
                 _korst = "",
                 _paddestoel = "",
-                _vlees = ""
+                _vlees = "",
+                _bezorgtijd = DateTime.Now
 
             };
         }
@@ -33,6 +34,56 @@ namespace Miniproject.ViewModel
                 {
                     _pizza._kaas = value;
                     RaisePropertyChanged("Kaas");
+                }
+            }
+        }
+
+        public string Korst
+        {
+            get { return _pizza._korst; }
+            set
+            {
+                if (_pizza._korst != value)
+                {
+                    _pizza._korst = value;
+                    RaisePropertyChanged("Korst");
+                }
+            }
+        }
+        public string Paddestoel
+        {
+            get { return _pizza._paddestoel; }
+            set
+            {
+                if (_pizza._paddestoel != value)
+                {
+                    _pizza._paddestoel = value;
+                    RaisePropertyChanged("Paddestoel");
+                }
+            }
+        }
+        public string Vlees
+        {
+            get { return _pizza._vlees; }
+            set
+            {
+                if (_pizza._vlees != value)
+                {
+                    _pizza._vlees = value;
+                    RaisePropertyChanged("Vlees");
+                }
+            }
+        }
+
+        public DateTime Bezorgtijd
+        {
+            get { return _pizza._bezorgtijd; }
+            set
+            {
+                if (_pizza._bezorgtijd != value)
+                {
+                    _pizza._bezorgtijd = value;
+                    RaisePropertyChanged("Bezorgtijd");
                 }
             }
         }

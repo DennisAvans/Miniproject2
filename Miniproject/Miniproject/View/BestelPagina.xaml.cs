@@ -2,12 +2,14 @@
 using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -113,14 +115,43 @@ namespace Miniproject.View
 
         #endregion
 
-        private void ContinueButton_Click(object sender, RoutedEventArgs e)
+        private async void ContinueButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(Kaart));
+            //if (_viewModel.Kaas.Equals(String.Empty) || _viewModel.Vlees.Equals(String.Empty) || _viewModel.Paddestoel.Equals(String.Empty) || _viewModel.Korst.Equals(String.Empty))
+            //{
+            //    MessageDialog msgbox = new MessageDialog("Je heb een of meerdere dingen nog niet geselecteerd!");
+            //    await msgbox.ShowAsync();
+            //}
+            //else if (ToS_checkbox.IsChecked == false)
+            //{
+            //    MessageDialog msgbox = new MessageDialog("Je moet akkoord gaan met de algemene voorwaarden!");
+            //    await msgbox.ShowAsync();
+            //}
+            //else
+            //{
+                Frame.Navigate(typeof(Kaart));
+            //}
+            Debug.WriteLine(_viewModel.Kaas + "\n" + _viewModel.Vlees + "\n" + _viewModel.Paddestoel + "\n" + _viewModel.Korst);
         }
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
+        }
+
+        private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
+        }
+
+        private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
+        }
+
+        private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
         }
     }
 }

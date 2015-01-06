@@ -8,6 +8,7 @@ using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -16,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -120,6 +122,17 @@ namespace Miniproject.View
 
         private async void GetLocationButton_Click(object sender, RoutedEventArgs e)
         {
+            Ellipse myCircle = new Ellipse();
+            myCircle.Fill = new SolidColorBrush(Colors.Blue);
+            myCircle.Height = 20;
+            myCircle.Width = 20;
+            myCircle.Opacity = 50;
+
+            //MapOverlay myLocationOverlay = new MapOverlay();
+            //myLocationOverlay.Content = myCircle;
+            //myLocationOverlay.PositionOrigin = new Point(0.5, 0.5);
+            //myLocationOverlay.GeoCoordinate = myGeoCoordinate;
+
             if (geo == null)
             {
                 geo = new Geolocator();

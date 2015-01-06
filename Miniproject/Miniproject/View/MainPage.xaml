@@ -29,8 +29,8 @@
 
         <!--TODO: Content should be placed within the following grid-->
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
-            <Button x:Name="BestelPizzaButton" Content="Bestel Pizza" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BestelPizzaButton_Click"/>
-            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="400" Width="360" FontSize="24" Foreground="#FF972A2A">
+            <Button x:Name="BestelPizzaButton" Content="Bestel Pizza" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BestelPizzaButton_Click" Height="168" Margin="0,0,0,-1" Width="352"/>
+            <TextBlock Margin="10,10,0,158" TextWrapping="Wrap" FontSize="24" Foreground="#FF972A2A">
         	<Run Text="Welkom bij Hotter than my pizza tracker!"/>
             </TextBlock>
         </Grid>

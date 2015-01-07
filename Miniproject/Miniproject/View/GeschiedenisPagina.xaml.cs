@@ -1,18 +1,12 @@
 ﻿using Miniproject.Common;
-using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
-using Windows.Storage;
-using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -29,24 +23,15 @@ namespace Miniproject.View
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class BestelPagina : Page
+    public sealed partial class GeschiedenisPagina : Page
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        public PizzaViewModel _viewModel;
-        private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-        private StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-        private string pizzastring = String.Empty;
-        private string filename = "pizzahistory2.txt";
-        private string result;
 
-        public BestelPagina()
+        public GeschiedenisPagina()
         {
             this.InitializeComponent();
 
-            _viewModel = (PizzaViewModel)base.DataContext;
-
-            this.NavigationCacheMode = NavigationCacheMode.Required;
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
@@ -111,9 +96,10 @@ namespace Miniproject.View
         /// </summary>
         /// <param name="e">Provides data for navigation methods and event
         /// handlers that cannot cancel the navigation request.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
+            var mapNotes = await App._bestellingen.getPizzas();
+            this.DataContext = mapNotes;
             this.navigationHelper.OnNavigatedTo(e);
         }
 
@@ -124,48 +110,9 @@ namespace Miniproject.View
 
         #endregion
 
-        private async void ContinueButton_Click(object sender, RoutedEventArgs e)
+        private void ListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (_viewModel.Kaas.Equals(String.Empty) || _viewModel.Vlees.Equals(String.Empty) || _viewModel.Paddestoel.Equals(String.Empty) || _viewModel.Korst.Equals(String.Empty))
-            {
-                MessageDialog msgbox = new MessageDialog("Je heb een of meerdere dingen nog niet geselecteerd!");
-                await msgbox.ShowAsync();
-            }
-            else if (ToS_checkbox.IsChecked == false)
-            {
-                MessageDialog msgbox = new MessageDialog("Je moet akkoord gaan met de algemene voorwaarden!");
-                await msgbox.ShowAsync();
-            }
-            else
-            {
-                Frame.Navigate(typeof(Kaart));
-                Model.Pizza pizza = new Model.Pizza(_viewModel.Kaas, _viewModel.Vlees, _viewModel.Paddestoel, _viewModel.Korst, _viewModel.Bezorgtijd);
-                App._bestellingen.addPizza(pizza);
-             
-                //pizzastring = result + "~" + _viewModel.Kaas + "@" + _viewModel.Vlees + "@" + _viewModel.Paddestoel + "@" + _viewModel.Korst;
-                Debug.WriteLine(pizza.ToString() + " ;;;" + App._bestellingen.getPizzasCount());
-            }
-            //Debug.WriteLine(_viewModel.Kaas + "\n" + _viewModel.Vlees + "\n" + _viewModel.Paddestoel + "\n" + _viewModel.Korst);
-        }
 
-        private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
-        }
-
-        private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
-        }
-
-        private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
-        }
-
-        private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
         }
     }
 }

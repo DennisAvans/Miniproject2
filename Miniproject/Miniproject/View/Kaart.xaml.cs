@@ -103,13 +103,13 @@ namespace Miniproject.View
         /// handlers that cannot cancel the navigation request.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            MapControl.Center = new Geopoint(new BasicGeoposition()
-    {
-        Latitude = 51.5854,
-        Longitude = 4.7905
-    });
-            MapControl.ZoomLevel = 15;
-            MapControl.LandmarksVisible = true;
+            //        MapControl.Center = new Geopoint(new BasicGeoposition()
+            //{
+            //    Latitude = 51.5854,
+            //    Longitude = 4.7905
+            //});
+            //        MapControl.ZoomLevel = 15;
+            //        MapControl.LandmarksVisible = true;
             this.navigationHelper.OnNavigatedTo(e);
         }
 

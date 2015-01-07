@@ -21,9 +21,19 @@ namespace Miniproject.ViewModel
                 _korst = "",
                 _paddestoel = "",
                 _vlees = "",
-                _bezorgtijd = DateTime.Now
+                _bezorgtijd = DateTime.Now.Add(new TimeSpan(0, 0, 30, 0))
 
             };
+        }
+        public TimeSpan addTime(int mins)
+        {
+            DateTime date = DateTime.Now;
+            TimeSpan time = new TimeSpan(0, 0, mins, 0);
+            DateTime combined = date.Add(time);
+
+            // now to show the timespan you can use
+            return TimeSpan.FromTicks(combined.Ticks);
+            
         }
         public string Kaas
         {

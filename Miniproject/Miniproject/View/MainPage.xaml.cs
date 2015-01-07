@@ -8,6 +8,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -28,6 +29,7 @@ namespace Miniproject
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
+
 
         public MainPage()
         {
@@ -98,8 +100,9 @@ namespace Miniproject
         /// </summary>
         /// <param name="e">Provides data for navigation methods and event
         /// handlers that cannot cancel the navigation request.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            await App._bestellingen.getPizzas();
             this.navigationHelper.OnNavigatedTo(e);
         }
 
@@ -113,6 +116,11 @@ namespace Miniproject
         private void BestelPizzaButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(BestelPagina));
+        }
+
+        private void GeschiedenisButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(GeschiedenisPagina));
         }
     }
 }

@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Miniproject.View;
+using Miniproject.Model;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -27,6 +28,7 @@ namespace Miniproject
     public sealed partial class App : Application
     {
         private TransitionCollection transitions;
+        public static Bestellingen _bestellingen;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -36,6 +38,7 @@ namespace Miniproject
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
+            _bestellingen = new Bestellingen();
         }
 
         /// <summary>

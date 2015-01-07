@@ -89,11 +89,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Bestellingen.cs" />
     <Compile Include="Model\Pizza.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\PizzaViewModel.cs" />
     <Compile Include="View\BestelPagina.xaml.cs">
       <DependentUpon>BestelPagina.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GeschiedenisPagina.xaml.cs">
+      <DependentUpon>GeschiedenisPagina.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Kaart.xaml.cs">
       <DependentUpon>Kaart.xaml</DependentUpon>
@@ -121,6 +125,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="View\BestelPagina.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\GeschiedenisPagina.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

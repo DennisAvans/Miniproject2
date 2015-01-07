@@ -19,5 +19,17 @@ namespace Miniproject.Model
         {
 
         }
+        public Pizza(string kaas, string vlees, string paddestoel, string korst, DateTime bezorgtijd)
+        {
+            this._kaas = kaas;
+            this._vlees = vlees;
+            this._paddestoel = paddestoel;
+            this._korst = korst;
+            this._bezorgtijd = bezorgtijd;
+        }
+        public override string ToString()
+        {
+            return this._kaas + " " + this._vlees + " " + this._paddestoel + " " + this._korst + " " + this._bezorgtijd;
+        }
     }
 }

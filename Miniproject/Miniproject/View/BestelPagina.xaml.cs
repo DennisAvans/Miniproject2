@@ -1,4 +1,5 @@
 ﻿using Miniproject.Common;
+using Miniproject.Model;
 using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace Miniproject.View
         public PizzaViewModel _viewModel;
         private ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
         private StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+        private Pizza _pizza;
+        private bool _fromHistory = false;
         private string pizzastring = String.Empty;
         private string filename = "pizzahistory2.txt";
         private string result;
@@ -113,12 +116,37 @@ namespace Miniproject.View
         /// handlers that cannot cancel the navigation request.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
-            this.navigationHelper.OnNavigatedTo(e);
+            if (e.Parameter == null)
+            {
+                Debug.WriteLine("Nieuw");
+                this._fromHistory = false;
+                this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
+            }
+            else
+            {
+                this._fromHistory = true;
+                Debug.WriteLine("Geschiedenis");
+                _pizza = (Pizza)e.Parameter;
+                this.PizzaTimePicker.Time = TimeSpan.FromTicks(_pizza._bezorgtijd.Ticks);
+                this.comboBox_Kaas.SelectedValue = _pizza._kaas;
+                this.comboBox_Fleesch.SelectedValue = _pizza._vlees;
+                this.comboBox_Paddos.SelectedValue = _pizza._paddestoel;
+                this.comboBox_Korst.SelectedValue = _pizza._korst;
+            }
+                this.navigationHelper.OnNavigatedTo(e);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            if (this._fromHistory == true)
+            {
+                this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
+                this.comboBox_Kaas.SelectedValue = string.Empty;
+                this.comboBox_Fleesch.SelectedValue = string.Empty;
+                this.comboBox_Paddos.SelectedValue = string.Empty;
+                this.comboBox_Korst.SelectedValue = string.Empty;
+                this.ToS_checkbox.IsChecked = false;
+            }
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
@@ -150,21 +178,25 @@ namespace Miniproject.View
 
         private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
         }
 
         private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
         }
 
         private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
         }
 
         private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
         }
     }

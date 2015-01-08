@@ -112,7 +112,7 @@ namespace Miniproject.View
 
         private void ListView_ItemClick(object sender, ItemClickEventArgs e)
         {
-
+            Frame.Navigate(typeof(BestelPagina), e.ClickedItem);
         }
     }
 }

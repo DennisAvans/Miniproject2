@@ -27,6 +27,7 @@ namespace Miniproject.Model
             this._korst = korst;
             this._bezorgtijd = bezorgtijd;
         }
+
         public override string ToString()
         {
             return this._kaas + " " + this._vlees + " " + this._paddestoel + " " + this._korst + " " + this._bezorgtijd;

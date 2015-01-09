@@ -1,36 +1,29 @@
 ﻿using Miniproject.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
+using Windows.Services.Maps;
 using Windows.UI;
-using Windows.UI.ViewManagement;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
 namespace Miniproject.View
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class Kaart : Page
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        Geolocator geo = null;
+        private Geolocator _geo = null;
+        private Ellipse _ellipse;
+        private bool _delivered = false;
+        private List<Geopoint> _route = new List<Geopoint>();
 
         public Kaart()
         {
@@ -42,74 +35,32 @@ namespace Miniproject.View
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
         }
 
-        /// <summary>
-        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
-        /// </summary>
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
         }
 
-        /// <summary>
-        /// Gets the view model for this <see cref="Page"/>.
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
         public ObservableDictionary DefaultViewModel
         {
             get { return this.defaultViewModel; }
         }
 
-        /// <summary>
-        /// Populates the page with content passed during navigation.  Any saved state is also
-        /// provided when recreating a page from a prior session.
-        /// </summary>
-        /// <param name="sender">
-        /// The source of the event; typically <see cref="NavigationHelper"/>
-        /// </param>
-        /// <param name="e">Event data that provides both the navigation parameter passed to
-        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
-        /// a dictionary of state preserved by this page during an earlier
-        /// session.  The state will be null the first time a page is visited.</param>
+
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
         }
 
-        /// <summary>
-        /// Preserves state associated with this page in case the application is suspended or the
-        /// page is discarded from the navigation cache.  Values must conform to the serialization
-        /// requirements of <see cref="SuspensionManager.SessionState"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
-        /// <param name="e">Event data that provides an empty dictionary to be populated with
-        /// serializable state.</param>
         private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
         }
 
-        #region NavigationHelper registration
-
-        /// <summary>
-        /// The methods provided in this section are simply used to allow
-        /// NavigationHelper to respond to the page's navigation methods.
-        /// <para>
-        /// Page specific logic should be placed in event handlers for the  
-        /// <see cref="NavigationHelper.LoadState"/>
-        /// and <see cref="NavigationHelper.SaveState"/>.
-        /// The navigation parameter is available in the LoadState method 
-        /// in addition to page state preserved during an earlier session.
-        /// </para>
-        /// </summary>
-        /// <param name="e">Provides data for navigation methods and event
-        /// handlers that cannot cancel the navigation request.</param>
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            //        MapControl.Center = new Geopoint(new BasicGeoposition()
-            //{
-            //    Latitude = 51.5854,
-            //    Longitude = 4.7905
-            //});
-            //        MapControl.ZoomLevel = 15;
-            //        MapControl.LandmarksVisible = true;
+            _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5807, Longitude = 4.7940 }));
+            _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5853, Longitude = 4.7943 }));
+            setToCurrentLocation();
+            await GetRouteAndDirections(_route);
+            await Task.Run(() => checkForPizza());
             this.navigationHelper.OnNavigatedTo(e);
         }
 
@@ -118,30 +69,113 @@ namespace Miniproject.View
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
-        #endregion
-
-        private async void GetLocationButton_Click(object sender, RoutedEventArgs e)
+        private async void setToCurrentLocation()
         {
-            Ellipse myCircle = new Ellipse();
-            myCircle.Fill = new SolidColorBrush(Colors.Blue);
-            myCircle.Height = 20;
-            myCircle.Width = 20;
-            myCircle.Opacity = 50;
+            if (_geo == null)
+                _geo = new Geolocator() { DesiredAccuracy = PositionAccuracy.High, ReportInterval = 1000 };
 
-            //MapOverlay myLocationOverlay = new MapOverlay();
-            //myLocationOverlay.Content = myCircle;
-            //myLocationOverlay.PositionOrigin = new Point(0.5, 0.5);
-            //myLocationOverlay.GeoCoordinate = myGeoCoordinate;
+            var location = await getLocationAsync();
+            await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
 
-            if (geo == null)
-            {
-                geo = new Geolocator();
-            }
-
-            Geoposition pos = await geo.GetGeopositionAsync();
-            InfoBox.Text = "Long: " + pos.Coordinate.Point.Position.Longitude.ToString() + " Lat: " + pos.Coordinate.Point.Position.Latitude.ToString() + " Accuracy: " + pos.Coordinate.Accuracy.ToString();
-
-            await MapControl.TrySetViewAsync(pos.Coordinate.Point, 16D);
+            _geo.PositionChanged += new TypedEventHandler<Geolocator, PositionChangedEventArgs>(geo_PositionChanged);
         }
+
+        private async void geo_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+               {
+                   var location = await getLocationAsync();
+                   map.Children.Remove(_ellipse);
+                   _ellipse = new Ellipse();
+
+                   _ellipse.Fill = new SolidColorBrush(Colors.Red);
+                   _ellipse.Width = 10;
+                   _ellipse.Height = 10;
+                   map.Children.Add(_ellipse);
+                   MapControl.SetLocation(_ellipse, location.Coordinate.Point);
+                   await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
+               });
+        }
+
+        private async void checkForPizza()
+        {
+            double latitude;
+            double longitude;
+            double distance = 0.02; // 20 meter
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
+            {
+                while (_delivered == false)
+                {
+                    latitude = 23; // long en lat van de pizzabezorger
+                    longitude = 23;
+                    var location = await getLocationAsync();
+                    if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
+                    {
+                        // doe iets
+
+                        _delivered = true;
+                    }
+                }
+            });
+        }
+
+        private async Task GetRouteAndDirections(List<Geopoint> list)
+        {
+            // Get the route between the points.
+            MapRouteFinderResult routeResult = await MapRouteFinder.GetWalkingRouteFromWaypointsAsync(list);
+
+            Debug.WriteLine("Route is opgehaald!");
+
+            //Display route with text
+            if (routeResult.Status == MapRouteFinderStatus.Success)
+            {
+                //InstructionsLabel.Text += "\n";
+                // Display the directions.
+
+                foreach (MapRouteLeg leg in routeResult.Route.Legs)
+                {
+                    foreach (MapRouteManeuver maneuver in leg.Maneuvers)
+                    {
+
+                    }
+                }
+                MapRouteView viewOfRoute = new MapRouteView(routeResult.Route);
+                viewOfRoute.RouteColor = Colors.LightBlue;
+                viewOfRoute.OutlineColor = Colors.DarkBlue;
+
+                // Add the new MapRouteView to the Routes collection
+                // of the MapControl.
+                map.Routes.Add(viewOfRoute);
+
+                // Fit the MapControl to the route.
+                await map.TrySetViewBoundsAsync(
+                    routeResult.Route.BoundingBox,
+                    null,
+                    Windows.UI.Xaml.Controls.Maps.MapAnimationKind.None);
+
+            }
+        }
+
+        public static double distanceBetweenPlaces(double lon1, double lat1, double lon2, double lat2)
+        {
+            const double RADIUS = 6378.16;
+            double dlon = degToRad(lon2 - lon1);
+            double dlat = degToRad(lat2 - lat1);
+
+            double a = (Math.Sin(dlat / 2) * Math.Sin(dlat / 2)) + Math.Cos(degToRad(lat1)) * Math.Cos(degToRad(lat2)) * (Math.Sin(dlon / 2) * Math.Sin(dlon / 2));
+            double angle = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return angle * RADIUS;
+        }
+
+        public static double degToRad(double x)
+        {
+            return x * 3.141592653589793 / 180;
+        }
+
+        private async Task<Geoposition> getLocationAsync()
+        {
+            return await _geo.GetGeopositionAsync();
+        }
+
     }
 }

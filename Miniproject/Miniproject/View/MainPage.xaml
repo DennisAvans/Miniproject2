@@ -28,12 +28,14 @@
         </StackPanel>
 
         <!--TODO: Content should be placed within the following grid-->
-        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="19,9.5,19,0">
+        <Grid Grid.Row="1" x:Name="ContentRoot" Margin="20,0">
             <Button x:Name="BestelPizzaButton" Content="Bestel Pizza" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BestelPizzaButton_Click"/>
             <Button x:Name="GeschiedenisButton" Content="Geschiedenis" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="GeschiedenisButton_Click"/>
-            <TextBlock Margin="10,10,0,158" TextWrapping="Wrap" FontSize="24" Foreground="#FF972A2A">
+            <Button Content="Help" HorizontalAlignment="Center" VerticalAlignment="Bottom" BorderThickness="0" Margin="129,-10,117,0" Width="93" Height="32"/>
+            <TextBlock TextWrapping="Wrap" FontSize="24" Foreground="#FF972A2A" Margin="0,0,0,100">
         	<Run Text="Welkom bij Hotter than my pizza tracker!"/>
             </TextBlock>
+            <Image HorizontalAlignment="Center" Height="244" VerticalAlignment="Center" Width="342" Source="/Assets/Logo.scale-240.png"/>
         </Grid>
     </Grid>
 </Page>

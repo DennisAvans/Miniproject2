@@ -46,6 +46,7 @@
                 <TextBox x:Name="UsernameTextBox" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="1"  Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="192" PlaceholderText="Gebruikersnaam" KeyDown="TextBox_KeyDown"/>
                 <PasswordBox x:Name="PasswordTextBox" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top" Height="33" Width="192" PlaceholderText="Wachtwoord" KeyDown="PasswordTextBox_KeyDown"/>
                 <Button x:Name="GoToRegisterButton" Content="Account aanmaken" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" Click="GoToRegisterButton_Click" BorderThickness="0" FontSize="14" Height="10" Width="140" Foreground="#FFACACAC"/>
+                <Button x:Name="HelpButton" Content="Help" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Click="HelpButton_Click"/>
                 <Button x:Name="LoginButton" Content="Log in" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" Click="LoginButton_Click"/>
             </Grid>
         </ScrollViewer>

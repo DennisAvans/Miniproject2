@@ -99,6 +99,9 @@
     <Compile Include="View\GeschiedenisPagina.xaml.cs">
       <DependentUpon>GeschiedenisPagina.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\HelpPagina.xaml.cs">
+      <DependentUpon>HelpPagina.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Kaart.xaml.cs">
       <DependentUpon>Kaart.xaml</DependentUpon>
     </Compile>
@@ -135,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\GeschiedenisPagina.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\HelpPagina.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

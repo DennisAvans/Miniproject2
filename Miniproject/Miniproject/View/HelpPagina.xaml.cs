@@ -1,14 +1,12 @@
 ﻿using Miniproject.Common;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
-using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -25,12 +23,12 @@ namespace Miniproject.View
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class LoginPagina : Page
+    public sealed partial class HelpPagina : Page
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-        public LoginPagina()
+        public HelpPagina()
         {
             this.InitializeComponent();
 
@@ -109,38 +107,5 @@ namespace Miniproject.View
         }
 
         #endregion
-
-        private void TextBox_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-                PasswordTextBox.Focus(FocusState.Keyboard);
-        }
-
-        private void PasswordTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-                LoginButton.Focus(FocusState.Keyboard);
-        }
-
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
-        {
-            if ((PasswordTextBox.Password.Equals(String.Empty)) || (UsernameTextBox.Text.Equals(string.Empty)))
-            {
-                await new MessageDialog("Gebruikersnaam of wachtwoord is leeg!").ShowAsync();
-                Debug.WriteLine(PasswordTextBox.Password.ToString());
-            }
-            // INLOGGEN
-             Frame.Navigate(typeof(MainPage));
-        }
-
-        private void GoToRegisterButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(RegistreerPagina));
-        }
-
-        private void HelpButton_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.Navigate(typeof(HelpPagina));
-        }
     }
 }

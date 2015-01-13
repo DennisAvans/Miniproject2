@@ -12,6 +12,7 @@ namespace PizzaServer
         private string username;
         private string password;
 
+
         public Klant(string username, string password)
         {
             this.username = username;

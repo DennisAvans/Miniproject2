@@ -17,11 +17,15 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.Networking;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
 namespace Miniproject.View
 {
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -30,9 +34,18 @@ namespace Miniproject.View
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
+        private StreamSocket clientSocket;
+        private HostName serverHost;
+        private string serverHostnameString;
+        private string serverPort;
+        private bool connected = false;
+        private bool closing = false;
+
         public LoginPagina()
         {
             this.InitializeComponent();
+            clientSocket = new StreamSocket();
+
 
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
@@ -122,15 +135,106 @@ namespace Miniproject.View
                 LoginButton.Focus(FocusState.Keyboard);
         }
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void Send_Click(object sender, RoutedEventArgs e)
         {
-            if ((PasswordTextBox.Password.Equals(String.Empty)) || (UsernameTextBox.Text.Equals(string.Empty)))
+            if (!connected)
             {
-                await new MessageDialog("Gebruikersnaam of wachtwoord is leeg!").ShowAsync();
-                Debug.WriteLine(PasswordTextBox.Password.ToString());
+                StatusLabel.Text = "Must be connected to send!";
+                return;
             }
-            // INLOGGEN
-             Frame.Navigate(typeof(MainPage));
+
+            UInt32 len = 0; // Gets the UTF-8 string length.
+
+            try
+            {
+                StatusLabel.Text = "Trying to send data ...";
+
+                // add a newline to the text to send
+                string sendData = "CON@" + UsernameTextBox.Text + "@" + PasswordTextBox.Password.ToString();
+                DataWriter writer = new DataWriter(clientSocket.OutputStream);
+                len = writer.MeasureString(sendData); // Gets the UTF-8 string length.
+
+                // Call StoreAsync method to store the data to a backing stream
+                await writer.StoreAsync();
+
+                StatusLabel.Text = "Data was sent" + Environment.NewLine;
+
+                // detach the stream and close it
+                writer.DetachStream();
+                writer.Dispose();
+
+            }
+            catch (Exception exception)
+            {
+                // If this is an unknown status, 
+                // it means that the error is fatal and retry will likely fail.
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                StatusLabel.Text = "Send data or receive failed with error: " + exception.Message;
+                // Could retry the connection, but for this simple example
+                // just close the socket.
+
+                closing = true;
+                clientSocket.Dispose();
+                clientSocket = null;
+                connected = false;
+
+            }
+
+            // Now try to receive data from server
+            try
+            {
+                StatusLabel.Text = "";
+                StatusLabel.Text = "Trying to receive data ...";
+
+                DataReader reader = new DataReader(clientSocket.InputStream);
+
+                uint sizeFieldCount = await reader.LoadAsync(sizeof(uint));
+                if (sizeFieldCount != sizeof(uint))
+                {
+                    // The underlying socket was closed before we were able to read the whole data.
+                    return;
+                }
+
+                // Read the string.
+                uint stringLength = reader.ReadUInt32();
+                uint actualStringLength = await reader.LoadAsync(stringLength);
+                if (stringLength != actualStringLength)
+                {
+                    // The underlying socket was closed before we were able to read the whole data.
+                    return;
+                }
+
+                string answer = reader.ReadString(actualStringLength);
+                if(answer.Equals("OK") {
+                    StatusLabel.Text = "OK";
+                }else {
+                    StatusLabel.Text = "ERROR";
+                }
+
+            }
+            catch (Exception exception)
+            {
+                // If this is an unknown status, 
+                // it means that the error is fatal and retry will likely fail.
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                StatusLabel.Text = "Receive failed with error: " + exception.Message;
+                // Could retry, but for this simple example
+                // just close the socket.
+
+                closing = true;
+                clientSocket.Dispose();
+                clientSocket = null;
+                connected = false;
+
+            }
         }
 
         private void GoToRegisterButton_Click(object sender, RoutedEventArgs e)

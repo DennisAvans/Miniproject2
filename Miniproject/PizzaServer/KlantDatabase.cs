@@ -38,7 +38,7 @@ namespace PizzaServer
             }
         }
 
-        public bool add(string username, string password)
+        public bool register(string username, string password)
         {
             foreach(var k in klanten)
             {
@@ -50,6 +50,19 @@ namespace PizzaServer
 
             klanten.Add(new Klant(username, password));
             return true;
+        }
+
+        public bool Logout(Klant klant)
+        {
+            foreach (var k in klanten)
+            {
+                if (k.getUserName().Equals(klant.getUserName()));
+                {
+                    klanten.Remove(k);
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Klant find(string username)

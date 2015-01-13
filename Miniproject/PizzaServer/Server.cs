@@ -74,11 +74,23 @@ namespace PizzaServer
                 switch (splitted[0])
                 {
 
-                    case "Con": handleConnect();
+                    case "Con": 
+                        
+                        klant = KDB.find(splitted[1]);
+                        if (klant != null)
+                        {
+                            if (!klant.autheticate(splitted[2]))
+                            {
+                                klant = null;
+                            }
+                        }
+                        bytes = Encoding.Unicode.GetBytes("OK");
+
                         break;
                     case "FDC":
                         Console.WriteLine("client has disconnected");
                         client.Close();
+                        klant = null;
                         return;
                     case "GPS":
                         break;
@@ -97,14 +109,7 @@ namespace PizzaServer
 
         private void handleConnect()
         {
-            klant = KDB.find(splitted[1]);
-            if (klant != null)
-            {
-                if (!klant.autheticate(splitted[2]))
-                {
-                    klant = null;
-                }
-            }
+            
         }
     }
 }

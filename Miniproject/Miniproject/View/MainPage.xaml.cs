@@ -63,6 +63,7 @@ namespace Miniproject
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedFrom(e);
+            Application.Current.Exit();
         }
 
         #endregion

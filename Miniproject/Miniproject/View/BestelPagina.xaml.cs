@@ -76,7 +76,7 @@ namespace Miniproject.View
                 this.comboBox_Paddos.SelectedValue = _pizza._paddestoel;
                 this.comboBox_Korst.SelectedValue = _pizza._korst;
             }
-                this.navigationHelper.OnNavigatedTo(e);
+            this.navigationHelper.OnNavigatedTo(e);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -112,7 +112,7 @@ namespace Miniproject.View
                 Frame.Navigate(typeof(Kaart));
                 Model.Pizza pizza = new Model.Pizza(_viewModel.Kaas, _viewModel.Vlees, _viewModel.Paddestoel, _viewModel.Korst, _viewModel.Bezorgtijd);
                 App._bestellingen.addPizza(pizza);
-             
+
                 //pizzastring = result + "~" + _viewModel.Kaas + "@" + _viewModel.Vlees + "@" + _viewModel.Paddestoel + "@" + _viewModel.Korst;
                 Debug.WriteLine(pizza.ToString() + " ;;;" + App._bestellingen.getPizzasCount());
             }
@@ -122,25 +122,25 @@ namespace Miniproject.View
         private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_fromHistory)
-            _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
+                _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
         }
 
         private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_fromHistory)
-            _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
+                _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
         }
 
         private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_fromHistory)
-            _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
+                _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
         }
 
         private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_fromHistory)
-            _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
+                _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
         }
     }
 }

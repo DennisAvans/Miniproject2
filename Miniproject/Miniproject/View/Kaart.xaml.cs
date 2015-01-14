@@ -1,6 +1,5 @@
 ﻿using Miniproject.Common;
 using Miniproject.Model;
-using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +22,8 @@ namespace Miniproject.View
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
         private Geolocator _geo = null;
-        private Ellipse _ellipse;
+        private Ellipse _mylocationMarker;
+        private Ellipse _pizzalocationMarker;
         private bool _delivered = false;
         private List<Geopoint> _route = new List<Geopoint>();
         private PizzaJongen _pizzaJongen = new PizzaJongen();
@@ -60,10 +60,10 @@ namespace Miniproject.View
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             setToCurrentLocation();
+            var location = await getLocationAsync();
+            var startpoint = new Geopoint(new BasicGeoposition() { Latitude = 51.5931, Longitude = 4.7813 }); // pizza start
 
-            _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5807, Longitude = 4.7940 }));
-            _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5853, Longitude = 4.7943 }));
-            await GetRouteAndDirections(_route);
+            await GetRouteAndDirections(startpoint, location.Coordinate.Point);
 
             await Task.Run(() => checkForPizza());
             this.navigationHelper.OnNavigatedTo(e);
@@ -74,11 +74,28 @@ namespace Miniproject.View
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
-        private void pizzaJongenLocationUpdate()
+        private void startPizzaJongenLocationUpdate()
         {
             // locatie van pizzajongen hele tijd updaten via server
-            _pizzaJongen._latitude = 0.0;
-            _pizzaJongen._latitude = 0.0;
+            if (_delivered == false)
+            {
+                for (int i = 0; i < _route.Count; i++)
+                {
+                    Debug.WriteLine("pizzaloc update!");
+                    _pizzaJongen._latitude = _route[i].Position.Latitude;
+                    _pizzaJongen._latitude = _route[i].Position.Longitude;
+
+                    map.Children.Remove(_pizzalocationMarker);
+                    _pizzalocationMarker = new Ellipse
+                    {
+                        Fill = new SolidColorBrush(Colors.Blue),
+                        Width = 10,
+                        Height = 10
+                    };
+                    map.Children.Add(_pizzalocationMarker);
+                    MapControl.SetLocation(_pizzalocationMarker, _route[i]);
+                }
+            }
         }
 
         private async void setToCurrentLocation()
@@ -97,14 +114,14 @@ namespace Miniproject.View
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
                {
                    var location = await getLocationAsync();
-                   map.Children.Remove(_ellipse);
-                   _ellipse = new Ellipse();
+                   map.Children.Remove(_mylocationMarker);
+                   _mylocationMarker = new Ellipse();
 
-                   _ellipse.Fill = new SolidColorBrush(Colors.Red);
-                   _ellipse.Width = 10;
-                   _ellipse.Height = 10;
-                   map.Children.Add(_ellipse);
-                   MapControl.SetLocation(_ellipse, location.Coordinate.Point);
+                   _mylocationMarker.Fill = new SolidColorBrush(Colors.Red);
+                   _mylocationMarker.Width = 10;
+                   _mylocationMarker.Height = 10;
+                   map.Children.Add(_mylocationMarker);
+                   MapControl.SetLocation(_mylocationMarker, location.Coordinate.Point);
                    await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
                });
         }
@@ -124,17 +141,16 @@ namespace Miniproject.View
                     if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
                     {
                         // doe iets
-
                         _delivered = true;
                     }
                 }
             });
         }
 
-        private async Task GetRouteAndDirections(List<Geopoint> list)
+        private async Task GetRouteAndDirections(Geopoint start, Geopoint end)
         {
             // Get the route between the points.
-            MapRouteFinderResult routeResult = await MapRouteFinder.GetWalkingRouteFromWaypointsAsync(list);
+            MapRouteFinderResult routeResult = await MapRouteFinder.GetDrivingRouteAsync(start, end);
 
             Debug.WriteLine("Route is opgehaald!");
 
@@ -148,7 +164,7 @@ namespace Miniproject.View
                 {
                     foreach (MapRouteManeuver maneuver in leg.Maneuvers)
                     {
-
+                        _route.Add(maneuver.StartingPoint);
                     }
                 }
                 MapRouteView viewOfRoute = new MapRouteView(routeResult.Route);
@@ -160,11 +176,9 @@ namespace Miniproject.View
                 map.Routes.Add(viewOfRoute);
 
                 // Fit the MapControl to the route.
-                await map.TrySetViewBoundsAsync(
-                    routeResult.Route.BoundingBox,
-                    null,
-                    Windows.UI.Xaml.Controls.Maps.MapAnimationKind.None);
+                await map.TrySetViewBoundsAsync(routeResult.Route.BoundingBox, null, Windows.UI.Xaml.Controls.Maps.MapAnimationKind.None);
 
+                startPizzaJongenLocationUpdate();
             }
         }
 

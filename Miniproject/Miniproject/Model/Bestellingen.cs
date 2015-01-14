@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
-using System.IO;
 
 namespace Miniproject.Model
 {
@@ -24,7 +21,7 @@ namespace Miniproject.Model
             await ensureDataLoaded();
             return _pizzas.Count;
         }
-        
+
         public async Task<List<Pizza>> getPizzas()
         {
             await ensureDataLoaded();
@@ -71,7 +68,7 @@ namespace Miniproject.Model
         private async Task savePizzaDataAsync()
         {
             var jsonSerializer = new DataContractJsonSerializer(typeof(List<Pizza>));
-            using (var stream = await ApplicationData.Current.LocalFolder.OpenStreamForWriteAsync(fileName,CreationCollisionOption.ReplaceExisting))
+            using (var stream = await ApplicationData.Current.LocalFolder.OpenStreamForWriteAsync(fileName, CreationCollisionOption.ReplaceExisting))
             {
                 jsonSerializer.WriteObject(stream, _pizzas);
             }

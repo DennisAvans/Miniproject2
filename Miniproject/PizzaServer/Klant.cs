@@ -9,8 +9,8 @@ namespace PizzaServer
     public class Klant
     {
         private string adres;
-        private string username;
-        private string password;
+        private string username { get; set; }
+        private string password { get; set; }
 
 
         public Klant(string username, string password)
@@ -26,11 +26,6 @@ namespace PizzaServer
                 return true;
             }
             return false;
-        }
-
-        public string getUserName()
-        {
-            return username;
         }
 
     }

@@ -1,77 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PizzaServer
 {
+    [Serializable()]
     public class KlantDatabase
     {
-        private const string filename = "klanten.dat";
-        PizzaServer.Serializer serializer;
-        private List<Klant> klanten;
+        public Dictionary<string, string> _logins { get; set; }
+        static string _filename = "klanten.wietje";
+        Serializer _serializer;
 
         public KlantDatabase()
         {
-            serializer = new PizzaServer.Serializer();
+            _logins = new Dictionary<string, string>();
+            _serializer = new Serializer();
         }
 
-        public void load()
+        public void add(string credentials)
         {
-            try {
-                klanten = (List<Klant>)serializer.DeSerializeObject(filename);
-            } catch(Exception e) {
-                Console.WriteLine(e.StackTrace);
-            }
-        }
-
-        public void save()
-        {
-            try
+            string[] splitted = credentials.Split(new string[] { "\n", "\r\n", ":" }, StringSplitOptions.RemoveEmptyEntries);
+            if (!_logins.ContainsKey(splitted[0]))
             {
-                serializer.SerializeObject(filename, klanten);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
+                _logins.Add(splitted[0], splitted[1]);
             }
         }
 
-        public bool register(string username, string password)
+        public bool loginValid(string name, string password)
         {
-            foreach(var k in klanten)
-            {
-                if(k.getUserName().Equals(username)) 
-                {
-                    return false;
-                }
-            }
-
-            klanten.Add(new Klant(username, password));
-            return true;
+            string ActualPassword;
+            return _logins.TryGetValue(name, out ActualPassword) &&
+                       ActualPassword.Equals(password);
         }
 
-        public bool Logout(Klant klant)
+        public bool userExist(string key)
         {
-            foreach (var k in klanten)
-            {
-                if (k.getUserName().Equals(klant.getUserName()));
-                {
-                    klanten.Remove(k);
-                    return true;
-                }
-            }
-            return false;
+            return _logins.ContainsKey(key);
+        }
+        public void del(string key)
+        {
+            _logins.Remove(key);
         }
 
-        public Klant find(string username)
+        public void empty()
         {
-            foreach (var k in klanten)
-            {
-                if (k.getUserName().Equals(username)) return k;
-            }
-            return null;
+            _logins.Clear();
+        }
+
+        public int getSize()
+        {
+            return _logins.Count;
+        }
+
+        // save the arraylist of measurements to a file
+        public void saveLogins()
+        {
+            _serializer.SerializeObject(_filename, _logins);
+        }
+
+        // load the arraylist of measurements from a file, returns the arraylist
+        public void loadLogins()
+        {
+            if (File.Exists(_filename))
+                this._logins = (Dictionary<string, string>)_serializer.DeSerializeObject(_filename);
         }
     }
 }

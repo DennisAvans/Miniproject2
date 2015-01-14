@@ -21,14 +21,8 @@ using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 
-// The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
-
 namespace Miniproject.View
 {
-
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class LoginPagina : Page
     {
         private NavigationHelper navigationHelper;
@@ -36,8 +30,8 @@ namespace Miniproject.View
 
         private StreamSocket clientSocket;
         private HostName serverHost;
-        private string serverHostnameString;
-        private string serverPort;
+        private string serverHostnameString = "127.0.0.1";
+        private string serverPort = "1330";
         private bool connected = false;
         private bool closing = false;
 
@@ -46,52 +40,25 @@ namespace Miniproject.View
             this.InitializeComponent();
             clientSocket = new StreamSocket();
 
-
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
         }
 
-        /// <summary>
-        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
-        /// </summary>
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
         }
 
-        /// <summary>
-        /// Gets the view model for this <see cref="Page"/>.
-        /// This can be changed to a strongly typed view model.
-        /// </summary>
         public ObservableDictionary DefaultViewModel
         {
             get { return this.defaultViewModel; }
         }
 
-        /// <summary>
-        /// Populates the page with content passed during navigation.  Any saved state is also
-        /// provided when recreating a page from a prior session.
-        /// </summary>
-        /// <param name="sender">
-        /// The source of the event; typically <see cref="NavigationHelper"/>
-        /// </param>
-        /// <param name="e">Event data that provides both the navigation parameter passed to
-        /// <see cref="Frame.Navigate(Type, Object)"/> when this page was initially requested and
-        /// a dictionary of state preserved by this page during an earlier
-        /// session.  The state will be null the first time a page is visited.</param>
         private void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
         }
 
-        /// <summary>
-        /// Preserves state associated with this page in case the application is suspended or the
-        /// page is discarded from the navigation cache.  Values must conform to the serialization
-        /// requirements of <see cref="SuspensionManager.SessionState"/>.
-        /// </summary>
-        /// <param name="sender">The source of the event; typically <see cref="NavigationHelper"/></param>
-        /// <param name="e">Event data that provides an empty dictionary to be populated with
-        /// serializable state.</param>
         private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
         }
@@ -135,8 +102,12 @@ namespace Miniproject.View
                 LoginButton.Focus(FocusState.Keyboard);
         }
 
-        private async void Send_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            tryConnect();
+            sendData("test");
+            #region franks code, heb ik even in methodes gezet
+            /*
             if (!connected)
             {
                 StatusLabel.Text = "Must be connected to send!";
@@ -209,9 +180,12 @@ namespace Miniproject.View
                 }
 
                 string answer = reader.ReadString(actualStringLength);
-                if(answer.Equals("OK") {
+                if (answer.Equals("OK"))
+                {
                     StatusLabel.Text = "OK";
-                }else {
+                }
+                else
+                {
                     StatusLabel.Text = "ERROR";
                 }
 
@@ -235,6 +209,123 @@ namespace Miniproject.View
                 connected = false;
 
             }
+             */
+            #endregion
+        }
+
+        private async void tryConnect()
+        {
+            if (connected)
+            {
+                StatusLabel.Text = "Status: al verbonden";
+                return;
+            }
+            try
+            {
+                StatusLabel.Text = "Status: proberen te verbinden...";
+                serverHost = new HostName(serverHostnameString);
+                // Try to connect to the 
+                await clientSocket.ConnectAsync(serverHost, serverPort);
+                connected = true;
+                StatusLabel.Text = "Status: verbinding gemaakt";
+
+            }
+            catch (Exception exception)
+            {
+                // If this is an unknown status, 
+                // it means that the error is fatal and retry will likely fail.
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+                StatusLabel.Text = "Status: connectie error: " + exception.Message;
+                // Could retry the connection, but for this simple example
+                // just close the socket.
+
+                closing = true;
+                // the Close method is mapped to the C# Dispose
+                clientSocket.Dispose();
+                clientSocket = null;
+            }
+        }
+
+        private async void sendData(string data)
+        {
+            if (!connected)
+            {
+                StatusLabel.Text = "Status: Must be connected to send!";
+                return;
+            }
+            UInt32 len = 0; // Gets the UTF-8 string length.
+            try
+            {
+                StatusLabel.Text = "Status: Trying to send data ...";
+
+                // add a newline to the text to send
+                string sendData = data;
+                DataWriter writer = new DataWriter(clientSocket.OutputStream);
+                len = writer.MeasureString(sendData); // Gets the UTF-8 string length.
+
+                // Call StoreAsync method to store the data to a backing stream
+                await writer.StoreAsync();
+
+                StatusLabel.Text = "Status: Data was sent" + Environment.NewLine;
+
+                // detach the stream and close it
+                writer.DetachStream();
+                writer.Dispose();
+
+            }
+            catch (Exception exception)
+            {
+                // If this is an unknown status, 
+                // it means that the error is fatal and retry will likely fail.
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                StatusLabel.Text = "Status: Send data or receive failed with error: " + exception.Message;
+                // Could retry the connection, but for this simple example
+                // just close the socket.
+
+                closing = true;
+                clientSocket.Dispose();
+                clientSocket = null;
+                connected = false;
+            }
+            /*
+            // Now try to receive data from server
+            try
+            {
+                StatusLabel.Text = "Trying to receive data ...";
+
+                DataReader reader = new DataReader(clientSocket.InputStream);
+                // Set inputstream options so that we don't have to know the data size
+                reader.InputStreamOptions = InputStreamOptions.Partial;
+                await reader.LoadAsync(reader.UnconsumedBufferLength);
+
+            }
+            catch (Exception exception)
+            {
+                // If this is an unknown status, 
+                // it means that the error is fatal and retry will likely fail.
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                StatusLabel.Text = "Receive failed with error: " + exception.Message;
+                // Could retry, but for this simple example
+                // just close the socket.
+
+                closing = true;
+                clientSocket.Dispose();
+                clientSocket = null;
+                connected = false;
+
+            }
+            */
         }
 
         private void GoToRegisterButton_Click(object sender, RoutedEventArgs e)
@@ -246,5 +337,6 @@ namespace Miniproject.View
         {
             Frame.Navigate(typeof(HelpPagina));
         }
+
     }
 }

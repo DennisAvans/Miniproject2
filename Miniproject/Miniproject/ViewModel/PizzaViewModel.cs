@@ -10,8 +10,6 @@ namespace Miniproject.ViewModel
 {
     public class PizzaViewModel : INotifyPropertyChanged
     {
-
-
         Pizza _pizza;
         public PizzaViewModel()
         {

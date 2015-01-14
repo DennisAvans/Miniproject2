@@ -1,4 +1,6 @@
 ﻿using Miniproject.Common;
+using Miniproject.Model;
+using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,15 +26,16 @@ namespace Miniproject.View
         private Ellipse _ellipse;
         private bool _delivered = false;
         private List<Geopoint> _route = new List<Geopoint>();
+        private PizzaJongen _pizzaJongen = new PizzaJongen();
 
         public Kaart()
         {
             this.InitializeComponent();
-
             this.NavigationCacheMode = NavigationCacheMode.Required;
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
+
         }
 
         public NavigationHelper NavigationHelper
@@ -56,10 +59,12 @@ namespace Miniproject.View
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            setToCurrentLocation();
+
             _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5807, Longitude = 4.7940 }));
             _route.Add(new Geopoint(new BasicGeoposition() { Latitude = 51.5853, Longitude = 4.7943 }));
-            setToCurrentLocation();
             await GetRouteAndDirections(_route);
+
             await Task.Run(() => checkForPizza());
             this.navigationHelper.OnNavigatedTo(e);
         }
@@ -67,6 +72,13 @@ namespace Miniproject.View
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedFrom(e);
+        }
+
+        private void pizzaJongenLocationUpdate()
+        {
+            // locatie van pizzajongen hele tijd updaten via server
+            _pizzaJongen._latitude = 0.0;
+            _pizzaJongen._latitude = 0.0;
         }
 
         private async void setToCurrentLocation()
@@ -106,8 +118,8 @@ namespace Miniproject.View
             {
                 while (_delivered == false)
                 {
-                    latitude = 23; // long en lat van de pizzabezorger
-                    longitude = 23;
+                    latitude = _pizzaJongen._latitude; // long en lat van de pizzabezorger
+                    longitude = _pizzaJongen._longitude;
                     var location = await getLocationAsync();
                     if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
                     {

@@ -4,9 +4,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Collections;
-using Utils;
 using System.Collections.Generic;
-using System.ServiceModel.Syndication;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -26,10 +24,8 @@ namespace PizzaServer
             //updateTimer.Elapsed += updateURLs;
             //updateTimer.Start();
 
-            
-
             KDB = new KlantDatabase();
-            KDB.load();
+            KDB.loadLogins();
       
             TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 1330);
             listener.Start();
@@ -39,7 +35,6 @@ namespace PizzaServer
             {
                 //AcceptTcpClient waits for a connection from the client
                 incomingClient = listener.AcceptTcpClient();
-
                 //start a new thread to handle this connection so we can go back to waiting for another client
                 Thread thread = new Thread(HandleClientThread);
                 thread.IsBackground = true;
@@ -49,8 +44,9 @@ namespace PizzaServer
 
         private void HandleClientThread(object obj)
         {
+            //DataReader reader = new DataReader(clientSocket.InputStream);
             TcpClient client = obj as TcpClient;
-            Klant klant;
+            Klant klant = null;
 
             Console.WriteLine("Connection found!");
             while (true)
@@ -73,10 +69,9 @@ namespace PizzaServer
                 byte[] bytes = null;
                 switch (splitted[0])
                 {
-
                     case "Con": 
                         
-                        klant = KDB.find(splitted[1]);
+                        //klant = KDB.find(splitted[1]);
                         if (klant != null)
                         {
                             if (!klant.autheticate(splitted[2]))
@@ -98,7 +93,6 @@ namespace PizzaServer
                         Klant k = new Klant(splitted[1], splitted[2]);
                         break; 
                     default:
-                        bytes = Encoding.Unicode.GetBytes(UpdateFeed(received));
                         break;
                 }
 

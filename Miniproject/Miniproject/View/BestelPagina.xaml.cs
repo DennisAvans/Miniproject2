@@ -22,8 +22,6 @@ namespace Miniproject.View
         private Pizza _pizza;
         private bool _fromHistory = false;
         private string pizzastring = String.Empty;
-        private string filename = "pizzahistory2.txt";
-        private string result;
 
         public BestelPagina()
         {
@@ -63,14 +61,21 @@ namespace Miniproject.View
             {
                 Debug.WriteLine("Nieuw");
                 this._fromHistory = false;
-                this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
+                this.PizzaTimePicker.Time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute + 30, 0);
             }
             else
             {
                 this._fromHistory = true;
                 Debug.WriteLine("Geschiedenis");
                 _pizza = (Pizza)e.Parameter;
-                this.PizzaTimePicker.Time = TimeSpan.FromTicks(_pizza._bezorgtijd.Ticks);
+
+                _viewModel.Bezorgtijd = _pizza._bezorgtijd;
+                _viewModel.Kaas = _pizza._kaas;
+                _viewModel.Vlees = _pizza._vlees;
+                _viewModel.Paddestoel = _pizza._paddestoel;
+                _viewModel.Korst = _pizza._korst;
+
+                this.PizzaTimePicker.Time = _pizza._bezorgtijd;
                 this.comboBox_Kaas.SelectedValue = _pizza._kaas;
                 this.comboBox_Fleesch.SelectedValue = _pizza._vlees;
                 this.comboBox_Paddos.SelectedValue = _pizza._paddestoel;
@@ -83,7 +88,7 @@ namespace Miniproject.View
         {
             if (this._fromHistory == true)
             {
-                this.PizzaTimePicker.Time = TimeSpan.FromTicks(DateTime.Now.Add(new TimeSpan(0, 0, 30, 0)).Ticks);
+                this.PizzaTimePicker.Time = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute + 30, 0);
                 this.comboBox_Kaas.SelectedValue = string.Empty;
                 this.comboBox_Fleesch.SelectedValue = string.Empty;
                 this.comboBox_Paddos.SelectedValue = string.Empty;
@@ -113,34 +118,33 @@ namespace Miniproject.View
                 Model.Pizza pizza = new Model.Pizza(_viewModel.Kaas, _viewModel.Vlees, _viewModel.Paddestoel, _viewModel.Korst, _viewModel.Bezorgtijd);
                 App._bestellingen.addPizza(pizza);
 
-                //pizzastring = result + "~" + _viewModel.Kaas + "@" + _viewModel.Vlees + "@" + _viewModel.Paddestoel + "@" + _viewModel.Korst;
-                Debug.WriteLine(pizza.ToString() + " ;;;" + App._bestellingen.getPizzasCount());
+                Debug.WriteLine(pizza.ToString() + " ;;; " + App._bestellingen.getPizzasCount());
             }
-            //Debug.WriteLine(_viewModel.Kaas + "\n" + _viewModel.Vlees + "\n" + _viewModel.Paddestoel + "\n" + _viewModel.Korst);
         }
 
         private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_fromHistory)
-                _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
+            _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
         }
 
         private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_fromHistory)
-                _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
+            _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
         }
 
         private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_fromHistory)
-                _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
+            _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
         }
 
         private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!_fromHistory)
-                _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
+            _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
+        }
+
+        private void PizzaTimePicker_TimeChanged(object sender, TimePickerValueChangedEventArgs e)
+        {
+            _viewModel.Bezorgtijd = PizzaTimePicker.Time;
         }
     }
 }

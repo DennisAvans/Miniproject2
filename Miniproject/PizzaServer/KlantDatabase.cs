@@ -17,12 +17,11 @@ namespace PizzaServer
             _serializer = new Serializer();
         }
 
-        public void add(string credentials)
+        public void add(string username, string password)
         {
-            string[] splitted = credentials.Split(new string[] { "\n", "\r\n", ":" }, StringSplitOptions.RemoveEmptyEntries);
-            if (!_logins.ContainsKey(splitted[0]))
+            if (!userExist(username))
             {
-                _logins.Add(splitted[0], splitted[1]);
+                _logins.Add(username, password);
             }
         }
 
@@ -37,6 +36,7 @@ namespace PizzaServer
         {
             return _logins.ContainsKey(key);
         }
+
         public void del(string key)
         {
             _logins.Remove(key);
@@ -52,13 +52,11 @@ namespace PizzaServer
             return _logins.Count;
         }
 
-        // save the arraylist of measurements to a file
         public void saveLogins()
         {
             _serializer.SerializeObject(_filename, _logins);
         }
 
-        // load the arraylist of measurements from a file, returns the arraylist
         public void loadLogins()
         {
             if (File.Exists(_filename))

@@ -1,5 +1,7 @@
 ﻿using Miniproject.Common;
 using Miniproject.View;
+using System.Diagnostics;
+using Windows.Phone.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
@@ -11,7 +13,6 @@ namespace Miniproject
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-
         public MainPage()
         {
             this.InitializeComponent();
@@ -20,6 +21,17 @@ namespace Miniproject
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
+            HardwareButtons.BackPressed += HardwareButtons_BackPressed;
+        }
+
+        private void HardwareButtons_BackPressed(object sender, BackPressedEventArgs e)
+        {
+            Frame frame = Window.Current.Content as Frame;
+            if (frame.SourcePageType.ToString().Contains("MainPage"))
+            {
+                App.sendData("DISCONNECT");
+                Application.Current.Exit();
+            }
         }
 
         public NavigationHelper NavigationHelper
@@ -49,7 +61,6 @@ namespace Miniproject
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedFrom(e);
-           // Application.Current.Exit();
         }
 
         #endregion

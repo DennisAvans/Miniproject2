@@ -1,52 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using Miniproject.Model;
+using Miniproject.View;
+using System;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.Networking;
+using Windows.Networking.Sockets;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
-using Miniproject.View;
-using Miniproject.Model;
 
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
 namespace Miniproject
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
     public sealed partial class App : Application
     {
         private TransitionCollection transitions;
         public static Bestellingen _bestellingen;
+        public static StreamSocket _clientSocket;
+        private HostName _serverHost;
+        private string _serverHostnameString = "127.0.0.1";
+        private string _serverPort = "1330";
+        public static bool _connected = false;
+        public static bool _closing = false;
 
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
         public App()
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
             _bestellingen = new Bestellingen();
+            _clientSocket = new StreamSocket();
+            tryConnect();
         }
 
-        /// <summary>
-        /// Invoked when the application is launched normally by the end user.  Other entry points
-        /// will be used when the application is launched to open a specific file, to display
-        /// search results, and so forth.
-        /// </summary>
-        /// <param name="e">Details about the launch request and process.</param>
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
@@ -105,11 +94,6 @@ namespace Miniproject
             Window.Current.Activate();
         }
 
-        /// <summary>
-        /// Restores the content transitions after the app has launched.
-        /// </summary>
-        /// <param name="sender">The object where the handler is attached.</param>
-        /// <param name="e">Details about the navigation event.</param>
         private void RootFrame_FirstNavigated(object sender, NavigationEventArgs e)
         {
             var rootFrame = sender as Frame;
@@ -117,13 +101,6 @@ namespace Miniproject
             rootFrame.Navigated -= this.RootFrame_FirstNavigated;
         }
 
-        /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
-        /// without knowing whether the application will be terminated or resumed with the contents
-        /// of memory still intact.
-        /// </summary>
-        /// <param name="sender">The source of the suspend request.</param>
-        /// <param name="e">Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
@@ -131,5 +108,115 @@ namespace Miniproject
             // TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
+        #region connect
+        private async void tryConnect()
+        {
+            if (_connected)
+            {
+                //  StatusLabel.Text = "Status: al verbonden";
+                return;
+            }
+            try
+            {
+                //  StatusLabel.Text = "Status: proberen te verbinden...";
+                _serverHost = new HostName(_serverHostnameString);
+                await _clientSocket.ConnectAsync(_serverHost, _serverPort);
+                _connected = true;
+                // StatusLabel.Text = "Status: verbinding gemaakt";
+
+            }
+            catch (Exception exception)
+            {
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+                //  StatusLabel.Text = "Status: connectie error: " + exception.Message;
+
+                _closing = true;
+                _clientSocket.Dispose();
+                _clientSocket = null;
+            }
+        }
+        #endregion
+
+        #region commands sendData & readData
+        public static async void sendData(string dataToSend)
+        {
+            if (!_connected)
+            {
+                // StatusLabel.Text = "Status: Must be connected to send!";
+                return;
+            }
+            try
+            {
+                byte[] data = GetBytes(dataToSend);
+                IBuffer buffer = data.AsBuffer();
+
+                // StatusLabel.Text = "Status: Trying to send data ...";
+                await _clientSocket.OutputStream.WriteAsync(buffer);
+
+                //StatusLabel.Text = "Status: Data was sent" + Environment.NewLine;
+            }
+            catch (Exception exception)
+            {
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                //StatusLabel.Text = "Status: Send data or receive failed with error: " + exception.Message;
+                _closing = true;
+                _clientSocket.Dispose();
+                _clientSocket = null;
+                _connected = false;
+            }
+        }
+
+        public static async Task<string> readData()
+        {
+            // string result = await App.readData();
+            //  StatusLabel.Text = "Trying to receive data ...";
+            try
+            {
+                // Read the string.
+                IBuffer buffer = new byte[1024].AsBuffer();
+                await _clientSocket.InputStream.ReadAsync(buffer, buffer.Capacity, InputStreamOptions.Partial);
+                byte[] result = buffer.ToArray();
+                return GetString(result);
+                //     StatusLabel.Text = GetString(result);
+            }
+            catch (Exception exception)
+            {
+                if (SocketError.GetStatus(exception.HResult) == SocketErrorStatus.Unknown)
+                {
+                    throw;
+                }
+
+                //  StatusLabel.Text = "Receive failed with error: " + exception.Message;
+                _closing = true;
+                _clientSocket.Dispose();
+                _clientSocket = null;
+                _connected = false;
+                return "ERROR";
+            }
+        }
+        #endregion
+
+        public static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        public static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
+        }
+
     }
 }

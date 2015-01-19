@@ -8,20 +8,15 @@ namespace PizzaServer
 {
     public class Server
     {
-        private TcpClient incomingClient;
-        private System.Timers.Timer updateTimer;
-        private static KlantDatabase KDB;
+        private TcpClient _incomingClient;
+        private KlantDatabase _klantDatabase;
+        private NetworkStream _netStream = null;
 
         public Server()
         {
-            //updaten via timers > http://stackoverflow.com/questions/1435876/do-c-sharp-timers-elapse-on-a-separate-thread
-            //updateTimer = new System.Timers.Timer(1000);
-            //updateTimer.Elapsed += updateURLs;
-            //updateTimer.Start();
+            _klantDatabase = new KlantDatabase();
+            _klantDatabase.loadLogins();
 
-            KDB = new KlantDatabase();
-            KDB.loadLogins();
-      
             TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 1330);
             listener.Start();
 
@@ -29,25 +24,24 @@ namespace PizzaServer
             while (true)
             {
                 //AcceptTcpClient waits for a connection from the client
-                incomingClient = listener.AcceptTcpClient();
+                _incomingClient = listener.AcceptTcpClient();
                 //start a new thread to handle this connection so we can go back to waiting for another client
                 Thread thread = new Thread(HandleClientThread);
                 thread.IsBackground = true;
-                thread.Start(incomingClient);
+                thread.Start(_incomingClient);
             }
         }
 
         private void HandleClientThread(object obj)
         {
-            //DataReader reader = new DataReader(clientSocket.InputStream);
             TcpClient client = obj as TcpClient;
-            Klant klant = null;
-
+            _netStream = client.GetStream();
             Console.WriteLine("Connection found!");
+
             while (true)
             {
                 // data lezen
-                byte[] buffer = new byte[50000];
+                byte[] buffer = new byte[1024];
                 int totalRead = 0;
                 do
                 {
@@ -55,50 +49,81 @@ namespace PizzaServer
                     totalRead += read;
                 } while (client.GetStream().DataAvailable);
 
-                // data afhandelen
-                string received = Encoding.Unicode.GetString(buffer, 0, totalRead).ToLower();
+                string received = Encoding.ASCII.GetString(buffer, 0, totalRead).ToLower().Replace("\0", "");
 
-                Console.WriteLine("\nResponse from client: {0}", received);
+                Console.WriteLine("\nResponse from client: {0}", received); // DEBUG
+
+                // data afhandelen
 
                 string[] splitted = received.Split('@');
                 byte[] bytes = null;
                 switch (splitted[0])
                 {
-                    case "Con": 
-                        
-                        //klant = KDB.find(splitted[1]);
-                        if (klant != null)
-                        {
-                            if (!klant.autheticate(splitted[2]))
-                            {
-                                klant = null;
-                            }
-                        }
-                        bytes = Encoding.Unicode.GetBytes("OK");
-
+                    case "register": // get string as "register@Username@password"
+                        bytes = handleRegister(received);
                         break;
-                    case "FDC":
-                        Console.WriteLine("client has disconnected");
+                    case "login": // get string as "login@Username@password"
+                        bytes = handleLogin(received);
+                        break;
+                    case "disconnect":
+                        Console.WriteLine("A client has disconnected");
                         client.Close();
-                        klant = null;
                         return;
                     case "GPS":
                         break;
-                    case "Reg": // get string as "Reg@Username@password"
-                        Klant k = new Klant(splitted[1], splitted[2]);
-                        break; 
                     default:
+                        bytes = Encoding.ASCII.GetBytes(received);
                         break;
                 }
 
                 // data terugsturen
-                client.GetStream().Write(bytes, 0, bytes.Length);
+                client.GetStream().WriteAsync(bytes, 0, bytes.Length);
+            }
+        }
+
+        private byte[] handleRegister(string credentials)
+        {
+            string[] splitted = credentials.Split('@');
+            if (_klantDatabase.userExist(splitted[1]))
+                return GetBytes("~User already exists");
+            else
+            {
+                _klantDatabase.add(splitted[1], splitted[2]);
+                _klantDatabase.saveLogins();
+                return GetBytes("~User added");
+            }
+        }
+
+        private byte[] handleLogin(string credentials)
+        {
+            string[] splitted = credentials.Split('@');
+            if (!_klantDatabase.loginValid(splitted[1], splitted[2]))
+                return GetBytes("~Invalid credentials");
+            else
+            {
+                _klantDatabase.add(splitted[1], splitted[2]);
+                _klantDatabase.saveLogins();
+                return GetBytes("~Valid credentials");
             }
         }
 
         private void handleConnect()
         {
-            
+
+        }
+
+        public static byte[] GetBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        public static string GetString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
         }
     }
 }

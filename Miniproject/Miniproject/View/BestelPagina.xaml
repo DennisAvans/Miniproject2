@@ -45,7 +45,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Name="TimeLabel" Grid.Row="0" Grid.Column="0" TextWrapping="Wrap" Text="Kies uw bezorgtijd" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTipService.ToolTip="hi" FontSize="20"/>
-            <TimePicker x:Name="PizzaTimePicker" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" ClockIdentifier="24HourClock"/>
+            <TimePicker x:Name="PizzaTimePicker" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" ClockIdentifier="24HourClock" TimeChanged="PizzaTimePicker_TimeChanged"/>
 
             <TextBlock x:Name="KaasLabel" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Kies uw kaassoort" VerticalAlignment="Center" FontSize="20"/>
             <ComboBox x:Name="comboBox_Kaas" SelectionChanged="comboBox_Kaas_SelectionChanged" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" PlaceholderText="Kies hier">

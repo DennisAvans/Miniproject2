@@ -8,13 +8,13 @@ namespace Miniproject.Model
         public string _vlees { get; set; }
         public string _paddestoel { get; set; }
         public string _korst { get; set; }
-        public DateTime _bezorgtijd { get; set; }
+        public TimeSpan _bezorgtijd { get; set; }
 
         public Pizza()
         {
 
         }
-        public Pizza(string kaas, string vlees, string paddestoel, string korst, DateTime bezorgtijd)
+        public Pizza(string kaas, string vlees, string paddestoel, string korst, TimeSpan bezorgtijd)
         {
             this._kaas = kaas;
             this._vlees = vlees;

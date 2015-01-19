@@ -15,7 +15,7 @@ namespace Miniproject.ViewModel
                 _korst = "",
                 _paddestoel = "",
                 _vlees = "",
-                _bezorgtijd = DateTime.Now.Add(new TimeSpan(0, 0, 30, 0))
+                _bezorgtijd = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute + 30, 0)
 
             };
         }
@@ -27,7 +27,7 @@ namespace Miniproject.ViewModel
 
             // now to show the timespan you can use
             return TimeSpan.FromTicks(combined.Ticks);
-            
+
         }
         public string Kaas
         {
@@ -79,7 +79,7 @@ namespace Miniproject.ViewModel
             }
         }
 
-        public DateTime Bezorgtijd
+        public TimeSpan Bezorgtijd
         {
             get { return _pizza._bezorgtijd; }
             set

@@ -8,6 +8,7 @@ using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Services.Maps;
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Media;
@@ -74,16 +75,17 @@ namespace Miniproject.View
             this.navigationHelper.OnNavigatedFrom(e);
         }
 
-        private void startPizzaJongenLocationUpdate()
+        private async void startPizzaJongenLocationUpdate()
         {
             // locatie van pizzajongen hele tijd updaten via server
             if (_delivered == false)
             {
                 for (int i = 0; i < _route.Count; i++)
                 {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
                     Debug.WriteLine("pizzaloc update!");
                     _pizzaJongen._latitude = _route[i].Position.Latitude;
-                    _pizzaJongen._latitude = _route[i].Position.Longitude;
+                    _pizzaJongen._longitude = _route[i].Position.Longitude;
 
                     map.Children.Remove(_pizzalocationMarker);
                     _pizzalocationMarker = new Ellipse
@@ -104,7 +106,7 @@ namespace Miniproject.View
                 _geo = new Geolocator() { DesiredAccuracy = PositionAccuracy.High, ReportInterval = 1000 };
 
             var location = await getLocationAsync();
-            await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
+          //  await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
 
             _geo.PositionChanged += new TypedEventHandler<Geolocator, PositionChangedEventArgs>(geo_PositionChanged);
         }
@@ -122,7 +124,7 @@ namespace Miniproject.View
                    _mylocationMarker.Height = 10;
                    map.Children.Add(_mylocationMarker);
                    MapControl.SetLocation(_mylocationMarker, location.Coordinate.Point);
-                   await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
+                 //  await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
                });
         }
 
@@ -138,9 +140,11 @@ namespace Miniproject.View
                     latitude = _pizzaJongen._latitude; // long en lat van de pizzabezorger
                     longitude = _pizzaJongen._longitude;
                     var location = await getLocationAsync();
+                    Debug.WriteLine(longitude + " " + latitude + " " + location.Coordinate.Point.Position.Longitude + " " + location.Coordinate.Point.Position.Latitude);
                     if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
                     {
-                        // doe iets
+                        MessageDialog dialog = new MessageDialog("Je pizza is er binnen enkele ogenblikken");
+                        await dialog.ShowAsync();
                         _delivered = true;
                     }
                 }

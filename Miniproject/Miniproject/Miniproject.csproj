@@ -91,7 +91,6 @@
     </Compile>
     <Compile Include="Model\Bestellingen.cs" />
     <Compile Include="Model\Pizza.cs" />
-    <Compile Include="Model\PizzaJongen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\PizzaViewModel.cs" />
     <Compile Include="View\BestelPagina.xaml.cs">

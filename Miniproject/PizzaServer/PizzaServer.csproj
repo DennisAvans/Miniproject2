@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Klant.cs" />
     <Compile Include="KlantDatabase.cs" />
     <Compile Include="PizzaJongen.cs" />
     <Compile Include="Program.cs" />

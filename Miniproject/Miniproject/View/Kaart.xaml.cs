@@ -27,7 +27,6 @@ namespace Miniproject.View
         private Ellipse _pizzalocationMarker;
         private bool _delivered = false;
         private List<Geopoint> _route = new List<Geopoint>();
-        private PizzaJongen _pizzaJongen = new PizzaJongen();
 
         public Kaart()
         {

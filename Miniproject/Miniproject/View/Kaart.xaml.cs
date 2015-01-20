@@ -39,6 +39,35 @@ namespace Miniproject.View
 
         }
 
+        private async void showCurrentLocation()
+        {
+            if (_geo == null)
+                _geo = new Geolocator() { DesiredAccuracy = PositionAccuracy.High, ReportInterval = 1000 };
+
+            var location = await getLocationAsync();
+            // await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
+
+            _geo.PositionChanged += new TypedEventHandler<Geolocator, PositionChangedEventArgs>(geo_PositionChanged);
+        }
+
+        private async void geo_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
+            {
+                var location = await getLocationAsync();
+                map.Children.Remove(_mylocationMarker);
+                _mylocationMarker = new Ellipse();
+
+                _mylocationMarker.Fill = new SolidColorBrush(Colors.Red);
+                _mylocationMarker.Width = 10;
+                _mylocationMarker.Height = 10;
+                map.Children.Add(_mylocationMarker);
+                MapControl.SetLocation(_mylocationMarker, location.Coordinate.Point);
+
+            });
+        }
+
+        #region navigationhelpers
         public NavigationHelper NavigationHelper
         {
             get { return this.navigationHelper; }
@@ -60,14 +89,17 @@ namespace Miniproject.View
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            setToCurrentLocation();
-            var location = await getLocationAsync();
-            var startpoint = new Geopoint(new BasicGeoposition() { Latitude = 51.5931, Longitude = 4.7813 }); // pizza start
+            App.sendData("bestelpizza");
+            string x = await App.readData();
+            showCurrentLocation();
+            var point = new Geopoint(new BasicGeoposition() //locatie van de pizzaria
+                  {
+                      Latitude = 51.5931, 
+                      Longitude = 4.7813
+                  });
 
-
-            //await GetRouteAndDirections(startpoint, location.Coordinate.Point);
+            await map.TrySetViewAsync(point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
             await Task.Run(() => getpizzalocation());
-            await Task.Run(() => checkForPizza());
             this.navigationHelper.OnNavigatedTo(e);
         }
 
@@ -75,44 +107,25 @@ namespace Miniproject.View
         {
             this.navigationHelper.OnNavigatedFrom(e);
         }
+        #endregion
+
         private async void getpizzalocation()
         {
             await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
-       {
-           while (_delivered == false)
-           {
-               await Task.Delay(TimeSpan.FromSeconds(1));
-               App.sendData("updatepizza");
-               string coord = await App.readData();
-               string[] spliited = coord.Split('@');
-
-               Debug.WriteLine("pizzaloc update!");
-               var point = new Geopoint(new BasicGeoposition() { Latitude = Convert.ToDouble(spliited[0]), Longitude = Convert.ToDouble(spliited[1]) });
-               map.Children.Remove(_pizzalocationMarker);
-               _pizzalocationMarker = new Ellipse
-               {
-                   Fill = new SolidColorBrush(Colors.Blue),
-                   Width = 10,
-                   Height = 10
-               };
-               map.Children.Add(_pizzalocationMarker);
-               MapControl.SetLocation(_pizzalocationMarker, point);
-           }
-       });
-
-        }
-        private async void startPizzaJongenLocationUpdate()
-        {
-            // locatie van pizzajongen hele tijd updaten via server
-            if (_delivered == false)
             {
-                for (int i = 0; i < _route.Count; i++)
+                while (_delivered == false)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1));
-                    Debug.WriteLine("pizzaloc update!");
-                    _pizzaJongen._latitude = _route[i].Position.Latitude;
-                    _pizzaJongen._longitude = _route[i].Position.Longitude;
+                    await Task.Delay(TimeSpan.FromMilliseconds(500)); // 500ms delay
+                    App.sendData("updatepizza");
+                    string coord = await App.readData();
+                    string[] spliited = coord.Split('@');
 
+                    var point = new Geopoint(new BasicGeoposition()
+                    {
+                        Latitude = Convert.ToDouble(spliited[0]),
+                        Longitude = Convert.ToDouble(spliited[1])
+                    });
+                    isPizzaNearby(point); // check if pizza is near
                     map.Children.Remove(_pizzalocationMarker);
                     _pizzalocationMarker = new Ellipse
                     {
@@ -121,94 +134,26 @@ namespace Miniproject.View
                         Height = 10
                     };
                     map.Children.Add(_pizzalocationMarker);
-                    MapControl.SetLocation(_pizzalocationMarker, _route[i]);
-                }
-            }
-        }
-
-        private async void setToCurrentLocation()
-        {
-            if (_geo == null)
-                _geo = new Geolocator() { DesiredAccuracy = PositionAccuracy.High, ReportInterval = 1000 };
-
-            var location = await getLocationAsync();
-            //  await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
-
-            _geo.PositionChanged += new TypedEventHandler<Geolocator, PositionChangedEventArgs>(geo_PositionChanged);
-        }
-
-        private async void geo_PositionChanged(Geolocator sender, PositionChangedEventArgs e)
-        {
-            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
-               {
-                   var location = await getLocationAsync();
-                   map.Children.Remove(_mylocationMarker);
-                   _mylocationMarker = new Ellipse();
-
-                   _mylocationMarker.Fill = new SolidColorBrush(Colors.Red);
-                   _mylocationMarker.Width = 10;
-                   _mylocationMarker.Height = 10;
-                   map.Children.Add(_mylocationMarker);
-                   MapControl.SetLocation(_mylocationMarker, location.Coordinate.Point);
-                   //  await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
-               });
-        }
-
-        private async void checkForPizza()
-        {
-            double latitude;
-            double longitude;
-            double distance = 0.02; // 20 meter
-            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
-            {
-                while (_delivered == false)
-                {
-                    latitude = _pizzaJongen._latitude; // long en lat van de pizzabezorger
-                    longitude = _pizzaJongen._longitude;
-                    var location = await getLocationAsync();
-                    Debug.WriteLine(longitude + " " + latitude + " " + location.Coordinate.Point.Position.Longitude + " " + location.Coordinate.Point.Position.Latitude);
-                    if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
-                    {
-                        MessageDialog dialog = new MessageDialog("Je pizza is er binnen enkele ogenblikken");
-                        await dialog.ShowAsync();
-                        _delivered = true;
-                    }
+                    MapControl.SetLocation(_pizzalocationMarker, point);
+                    await map.TrySetViewAsync(point, 16, 0, 0, MapAnimationKind.Linear);
                 }
             });
         }
 
-        private async Task GetRouteAndDirections(Geopoint start, Geopoint end)
+        private async void isPizzaNearby(Geopoint point)
         {
-            // Get the route between the points.
-            MapRouteFinderResult routeResult = await MapRouteFinder.GetDrivingRouteAsync(start, end);
+            double latitude = point.Position.Latitude; // long en lat van de pizzabezorger;
+            double longitude = point.Position.Longitude;
+            double distance = 0.02; // 20 meter
+            var location = await getLocationAsync();
 
-            Debug.WriteLine("Route is opgehaald!");
-
-            //Display route with text
-            if (routeResult.Status == MapRouteFinderStatus.Success)
+            if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
             {
-                //InstructionsLabel.Text += "\n";
-                // Display the directions.
+                _delivered = true;
 
-                foreach (MapRouteLeg leg in routeResult.Route.Legs)
-                {
-                    foreach (MapRouteManeuver maneuver in leg.Maneuvers)
-                    {
-                        _route.Add(maneuver.StartingPoint);
-                    }
-                }
-                MapRouteView viewOfRoute = new MapRouteView(routeResult.Route);
-                viewOfRoute.RouteColor = Colors.LightBlue;
-                viewOfRoute.OutlineColor = Colors.DarkBlue;
+               MessageDialog dialog = new MessageDialog("Je pizza is er binnen enkele ogenblikken");
+                await dialog.ShowAsync();
 
-                // Add the new MapRouteView to the Routes collection
-                // of the MapControl.
-                map.Routes.Add(viewOfRoute);
-
-                // Fit the MapControl to the route.
-                await map.TrySetViewBoundsAsync(routeResult.Route.BoundingBox, null, Windows.UI.Xaml.Controls.Maps.MapAnimationKind.None);
-
-                startPizzaJongenLocationUpdate();
             }
         }
 

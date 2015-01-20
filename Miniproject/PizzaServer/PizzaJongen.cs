@@ -1,4 +1,5 @@
 ﻿using System.Timers;
+using System.Linq;
 namespace PizzaServer
 {
     class PizzaJongen
@@ -21,7 +22,16 @@ namespace PizzaServer
 
         public void t_Elapsed(object sender, ElapsedEventArgs e)
         {
+
             this.currentLocation = routeArray[counter];
+            // var stringQuery =
+            //from str in routeArray
+            // where 
+            //select str;
+            //foreach (string item in stringQuery)
+            //{
+
+            // }
             if (counter == 21 || counter == 0)
             {
                 step = -step;

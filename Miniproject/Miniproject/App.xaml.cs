@@ -23,7 +23,7 @@ namespace Miniproject
         public static StreamSocket _clientSocket;
         private HostName _serverHost;
 
-        private string _serverHostnameString = "127.0.0.1";  /* "145.48.224.168";*/
+        private string _serverHostnameString = /*"127.0.0.1";  */ "145.48.224.168";
         private string _serverPort = "1330";
         public static bool _connected = false;
         public static bool _closing = false;

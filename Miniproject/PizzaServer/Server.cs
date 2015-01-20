@@ -77,7 +77,8 @@ namespace PizzaServer
                         Console.WriteLine("A client has disconnected");
                         client.Close();
                         return;
-                    case "GPS":
+                    case "updatepizza":
+                        bytes = GetBytes(jongen.getNextLocation());
                         break;
                     default:
                         bytes = Encoding.ASCII.GetBytes(received);

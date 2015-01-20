@@ -64,8 +64,9 @@ namespace Miniproject.View
             var location = await getLocationAsync();
             var startpoint = new Geopoint(new BasicGeoposition() { Latitude = 51.5931, Longitude = 4.7813 }); // pizza start
 
-            await GetRouteAndDirections(startpoint, location.Coordinate.Point);
 
+            //await GetRouteAndDirections(startpoint, location.Coordinate.Point);
+            await Task.Run(() => getpizzalocation());
             await Task.Run(() => checkForPizza());
             this.navigationHelper.OnNavigatedTo(e);
         }
@@ -74,7 +75,32 @@ namespace Miniproject.View
         {
             this.navigationHelper.OnNavigatedFrom(e);
         }
+        private async void getpizzalocation()
+        {
+            await this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, async () =>
+       {
+           while (_delivered == false)
+           {
+               await Task.Delay(TimeSpan.FromSeconds(1));
+               App.sendData("updatepizza");
+               string coord = await App.readData();
+               string[] spliited = coord.Split('@');
 
+               Debug.WriteLine("pizzaloc update!");
+               var point = new Geopoint(new BasicGeoposition() { Latitude = Convert.ToDouble(spliited[0]), Longitude = Convert.ToDouble(spliited[1]) });
+               map.Children.Remove(_pizzalocationMarker);
+               _pizzalocationMarker = new Ellipse
+               {
+                   Fill = new SolidColorBrush(Colors.Blue),
+                   Width = 10,
+                   Height = 10
+               };
+               map.Children.Add(_pizzalocationMarker);
+               MapControl.SetLocation(_pizzalocationMarker, point);
+           }
+       });
+
+        }
         private async void startPizzaJongenLocationUpdate()
         {
             // locatie van pizzajongen hele tijd updaten via server
@@ -106,7 +132,7 @@ namespace Miniproject.View
                 _geo = new Geolocator() { DesiredAccuracy = PositionAccuracy.High, ReportInterval = 1000 };
 
             var location = await getLocationAsync();
-          //  await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
+            //  await map.TrySetViewAsync(location.Coordinate.Point, 16, 0, 0, MapAnimationKind.Linear);
 
             _geo.PositionChanged += new TypedEventHandler<Geolocator, PositionChangedEventArgs>(geo_PositionChanged);
         }
@@ -124,7 +150,7 @@ namespace Miniproject.View
                    _mylocationMarker.Height = 10;
                    map.Children.Add(_mylocationMarker);
                    MapControl.SetLocation(_mylocationMarker, location.Coordinate.Point);
-                 //  await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
+                   //  await map.TrySetViewAsync(location.Coordinate.Point, map.ZoomLevel, 0, 0, MapAnimationKind.Linear);
                });
         }
 

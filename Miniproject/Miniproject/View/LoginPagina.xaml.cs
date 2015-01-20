@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.UI.Popups;
+using Miniproject.Model;
 
 namespace Miniproject.View
 {

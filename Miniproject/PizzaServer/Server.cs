@@ -65,16 +65,16 @@ namespace PizzaServer
                     jongen = null;
                 }
 
-                if(received.Equals(String.Empty)) 
+                if (received.Equals(String.Empty))
                 {
-                connectionCounter++;
+                    connectionCounter++;
                 }
                 else
                 {
-                  connectionCounter = 0;
+                    connectionCounter = 0;
                 }
 
-               
+
                 Console.WriteLine("\nResponse from client: {0}", received); // DEBUG
 
                 // data afhandelen
@@ -109,9 +109,9 @@ namespace PizzaServer
                 {
                     client.GetStream().WriteAsync(bytes, 0, bytes.Length);
                 }
-                catch(ObjectDisposedException e)
+                catch (ObjectDisposedException e)
                 {
-                    Console.WriteLine("Force closed connection Exiting Thread now");
+                    Console.WriteLine("Force closed connection, exiting thread now: " + e.Message);
                 }
             }
         }

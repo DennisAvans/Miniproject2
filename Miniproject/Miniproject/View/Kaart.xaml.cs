@@ -1,12 +1,11 @@
 ﻿using Miniproject.Common;
 using Miniproject.Model;
+using Miniproject.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
-using Windows.Services.Maps;
 using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Xaml.Controls;
@@ -27,7 +26,7 @@ namespace Miniproject.View
         private Ellipse _pizzalocationMarker;
         private bool _delivered = false;
         private List<Geopoint> _route = new List<Geopoint>();
-
+        private PizzaViewModel viewModel;
         public Kaart()
         {
             this.InitializeComponent();
@@ -88,12 +87,14 @@ namespace Miniproject.View
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
+            this.viewModel = (PizzaViewModel)e.Parameter;
+            InfoBox.Text = "Verwachte aankomsttijd: " + viewModel.Bezorgtijd + "\n Kaas: " + viewModel.Kaas + "\n Korst: " + viewModel.Korst + "\n Paddestoel: " + viewModel.Paddestoel + "\n Vlees:" + viewModel.Vlees;
             App.sendData("bestelpizza");
             string x = await App.readData();
             showCurrentLocation();
             var point = new Geopoint(new BasicGeoposition() //locatie van de pizzaria
                   {
-                      Latitude = 51.5931, 
+                      Latitude = 51.5931,
                       Longitude = 4.7813
                   });
 
@@ -149,8 +150,9 @@ namespace Miniproject.View
             if (distanceBetweenPlaces(longitude, latitude, location.Coordinate.Point.Position.Longitude, location.Coordinate.Point.Position.Latitude) <= distance)
             {
                 _delivered = true;
-
-               MessageDialog dialog = new MessageDialog("Je pizza is er binnen enkele ogenblikken");
+                InfoBox.FontSize = 30;
+                InfoBox.Text = "Eet smakelijk!";
+                MessageDialog dialog = new MessageDialog("Je pizza is er binnen enkele ogenblikken");
                 await dialog.ShowAsync();
 
             }

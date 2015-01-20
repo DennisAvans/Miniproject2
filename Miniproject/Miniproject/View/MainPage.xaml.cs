@@ -1,6 +1,5 @@
 ﻿using Miniproject.Common;
 using Miniproject.View;
-using System.Diagnostics;
 using Windows.Phone.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -73,6 +72,11 @@ namespace Miniproject
         private void GeschiedenisButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(GeschiedenisPagina));
+        }
+
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(HelpPagina));
         }
     }
 }

@@ -23,22 +23,19 @@ namespace PizzaServer
 
         public void t_Elapsed(object sender, ElapsedEventArgs e)
         {
+            /* Zonder linq */
+            //this.currentLocation = routeArray[counter];
 
-            this.currentLocation = routeArray[counter];
-            // var stringQuery =
-            //from str in routeArray
-            // where 
-            //select str;
-            //foreach (string item in stringQuery)
-            //{
+            /* Met linq */
+            var stringQuery = from str in routeArray select str;
+            this.currentLocation = stringQuery.Skip(counter).First();
 
-            // }
             if (counter == 21 || counter == 0)
             {
-                step = -step;   
+                step = -step;
             }
             counter += step;
-                System.Console.WriteLine("Counter: " + counter + " step: " + step);
+            System.Console.WriteLine("Counter: " + counter + " step: " + step);
         }
 
         public async void startRoute()

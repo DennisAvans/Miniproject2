@@ -11,13 +11,14 @@ namespace PizzaServer
         private TcpClient _incomingClient;
         private KlantDatabase _klantDatabase;
         private NetworkStream _netStream = null;
+        PizzaJongen jongen = new PizzaJongen();
 
         public Server()
         {
             _klantDatabase = new KlantDatabase();
             _klantDatabase.loadLogins();
 
-            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 1330);
+            TcpListener listener = new TcpListener(1330);
             listener.Start();
 
             Console.WriteLine("Waiting for connection...");
@@ -41,16 +42,23 @@ namespace PizzaServer
             while (true)
             {
                 // data lezen
+                int connectionCounter = 0;
                 byte[] buffer = new byte[1024];
                 int totalRead = 0;
                 do
                 {
                     int read = client.GetStream().Read(buffer, totalRead, buffer.Length - totalRead);
                     totalRead += read;
+                    connectionCounter = 0;
                 } while (client.GetStream().DataAvailable);
 
                 string received = Encoding.ASCII.GetString(buffer, 0, totalRead).ToLower().Replace("\0", "");
+                connectionCounter++;
 
+                if(connectionCounter >= 10) 
+                {
+
+                }
                 Console.WriteLine("\nResponse from client: {0}", received); // DEBUG
 
                 // data afhandelen

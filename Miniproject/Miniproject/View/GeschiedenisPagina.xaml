@@ -46,7 +46,11 @@
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock Text="{Binding _bezorgtijd}" FontSize="26" TextWrapping="NoWrap" TextTrimming="WordEllipsis" />
-                                <TextBlock Text="{Binding _kaas}" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding _kaas}" TextWrapping="Wrap" FontSize="12" />
+                                <TextBlock Text="{Binding _vlees}" TextWrapping="Wrap" FontSize="12"/>
+                                <TextBlock Text="{Binding _paddestoel}" TextWrapping="Wrap" FontSize="12"/>
+                                <TextBlock Text="{Binding _korst}" TextWrapping="Wrap" FontSize="12"/>
+                                <TextBlock Text="Seperator" TextWrapping="Wrap" FontSize="12" Foreground="Black"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

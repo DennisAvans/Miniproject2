@@ -34,15 +34,14 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Maps:MapControl x:Name="map" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" MapServiceToken="Zxf8UmCg_ux0pq1PSZd8GA" />
-            <TextBlock x:Name="InfoBox" HorizontalAlignment="Left" Margin="140,425,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="38" Width="212" Text="Long: Lat: Accuracy:"/>
-            <TextBlock HorizontalAlignment="Left" Margin="10,10.167,0,0" Grid.Row="2" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="158" Width="380"/>
-
+            <Maps:MapControl x:Name="map" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="3" MapServiceToken="Zxf8UmCg_ux0pq1PSZd8GA" />
+            <TextBlock x:Name="InfoBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
         </Grid>
     </Grid>
 </Page>

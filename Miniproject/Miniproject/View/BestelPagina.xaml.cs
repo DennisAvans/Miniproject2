@@ -114,7 +114,7 @@ namespace Miniproject.View
             }
             else
             {
-                Frame.Navigate(typeof(Kaart));
+                Frame.Navigate(typeof(Kaart),_viewModel);
                 Model.Pizza pizza = new Model.Pizza(_viewModel.Kaas, _viewModel.Vlees, _viewModel.Paddestoel, _viewModel.Korst, _viewModel.Bezorgtijd);
                 App._bestellingen.addPizza(pizza);
 
@@ -124,26 +124,31 @@ namespace Miniproject.View
 
         private void comboBox_Kaas_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Kaas = comboBox_Kaas.SelectedItem.ToString();
         }
 
         private void comboBox_Fleesch_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Vlees = comboBox_Fleesch.SelectedItem.ToString();
         }
 
         private void comboBox_Paddos_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Paddestoel = comboBox_Paddos.SelectedItem.ToString();
         }
 
         private void comboBox_Korst_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Korst = comboBox_Korst.SelectedItem.ToString();
         }
 
         private void PizzaTimePicker_TimeChanged(object sender, TimePickerValueChangedEventArgs e)
         {
+            if (!_fromHistory)
             _viewModel.Bezorgtijd = PizzaTimePicker.Time;
         }
     }

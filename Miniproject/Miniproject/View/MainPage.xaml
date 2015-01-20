@@ -31,7 +31,7 @@
         <Grid Grid.Row="1" x:Name="ContentRoot" Margin="20,0">
             <Button x:Name="BestelPizzaButton" Content="Bestel Pizza" HorizontalAlignment="Right" VerticalAlignment="Bottom" Click="BestelPizzaButton_Click"/>
             <Button x:Name="GeschiedenisButton" Content="Geschiedenis" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="GeschiedenisButton_Click"/>
-            <Button Content="Help" HorizontalAlignment="Center" VerticalAlignment="Bottom" BorderThickness="0" Margin="129,-10,117,0" Width="93" Height="32"/>
+            <Button x:Name="HelpButton" Content="Help" HorizontalAlignment="Center" VerticalAlignment="Bottom" BorderThickness="0" Margin="129,-10,117,0" Width="93" Height="32" Click="HelpButton_Click"/>
             <TextBlock TextWrapping="Wrap" FontSize="24" Foreground="#FF972A2A" Margin="0,0,0,100">
         	<Run Text="Welkom bij Hotter than my pizza tracker!"/>
             </TextBlock>

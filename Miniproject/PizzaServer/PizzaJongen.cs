@@ -1,11 +1,13 @@
-﻿using System.Timers;
+﻿using System;
+using System.Threading.Tasks;
+using System.Timers;
 using System.Linq;
 namespace PizzaServer
 {
     class PizzaJongen
     {
         private string currentLocation;
-        private int counter = 0;
+        private int counter = 1;
         private int step = 1;
         private string[] routeArray = new string[22];
         private Timer t;
@@ -17,7 +19,6 @@ namespace PizzaServer
             t = new Timer();
             t.Interval = 1000;
             t.Elapsed += t_Elapsed;
-            t.Start();
         }
 
         public void t_Elapsed(object sender, ElapsedEventArgs e)
@@ -34,9 +35,22 @@ namespace PizzaServer
             // }
             if (counter == 21 || counter == 0)
             {
-                step = -step;
+                step = -step;   
             }
             counter += step;
+                System.Console.WriteLine("Counter: " + counter + " step: " + step);
+        }
+
+        public async void startRoute()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            t.Start();
+        }
+
+        public void stopRoute()
+        {
+            t.Stop();
+            t.Dispose();
         }
 
         public void setRouteOne()

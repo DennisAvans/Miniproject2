@@ -11,7 +11,6 @@ namespace PizzaServer
         private TcpClient _incomingClient;
         private KlantDatabase _klantDatabase;
         private NetworkStream _netStream = null;
-        PizzaJongen jongen = new PizzaJongen();
 
         public Server()
         {
@@ -35,30 +34,47 @@ namespace PizzaServer
 
         private void HandleClientThread(object obj)
         {
+            bool connected;
             TcpClient client = obj as TcpClient;
             _netStream = client.GetStream();
             Console.WriteLine("Connection found!");
+            connected = true;
+            int connectionCounter = 0;
+            PizzaJongen jongen = new PizzaJongen();
 
-            while (true)
+            while (connected)
             {
                 // data lezen
-                int connectionCounter = 0;
                 byte[] buffer = new byte[1024];
                 int totalRead = 0;
                 do
                 {
                     int read = client.GetStream().Read(buffer, totalRead, buffer.Length - totalRead);
                     totalRead += read;
-                    connectionCounter = 0;
-                } while (client.GetStream().DataAvailable);
+                } while (client.GetStream().DataAvailable && connected);
 
                 string received = Encoding.ASCII.GetString(buffer, 0, totalRead).ToLower().Replace("\0", "");
-                connectionCounter++;
 
-                if(connectionCounter >= 10) 
+                if (connectionCounter >= 3)
                 {
-
+                    client.Close();
+                    _netStream = null;
+                    buffer = null;
+                    connected = false;
+                    jongen.stopRoute();
+                    jongen = null;
                 }
+
+                if(received.Equals(String.Empty)) 
+                {
+                connectionCounter++;
+                }
+                else
+                {
+                  connectionCounter = 0;
+                }
+
+               
                 Console.WriteLine("\nResponse from client: {0}", received); // DEBUG
 
                 // data afhandelen
@@ -80,13 +96,23 @@ namespace PizzaServer
                     case "updatepizza":
                         bytes = GetBytes(jongen.getNextLocation());
                         break;
+                    case "bestelpizza": jongen.startRoute();
+                        bytes = GetBytes("Pizza jongen is onderweg");
+                        break;
                     default:
                         bytes = Encoding.ASCII.GetBytes(received);
                         break;
                 }
 
                 // data terugsturen
-                client.GetStream().WriteAsync(bytes, 0, bytes.Length);
+                try
+                {
+                    client.GetStream().WriteAsync(bytes, 0, bytes.Length);
+                }
+                catch(ObjectDisposedException e)
+                {
+                    Console.WriteLine("Force closed connection Exiting Thread now");
+                }
             }
         }
 
